@@ -33,23 +33,30 @@ CareerBridge helps users achieve career goals through:
 ## ✨ Features
 
 ### 🔐 Authentication & Security
-- User registration with email validation
-- JWT-based authentication (24-hour tokens)
-- Argon2 password hashing
-- Protected routes with token middleware
-- SQL injection prevention
+- **Simplified Registration**: Name, email, password only (no barriers)
+- **Instant Authentication**: JWT token generated immediately on registration
+- **Secure Tokens**: JWT-based authentication (24-hour validity)
+- **Strong Password Hashing**: Argon2 algorithm
+- **Protected Routes**: Token middleware on all sensitive endpoints
+- **Case-Insensitive Enums**: Flexible input handling (e.g., `Junior`, `junior`, `JUNIOR`)
+- **SQL Injection Prevention**: Parameterized queries via SQLx
 
 ### 👤 Profile Management
-- Complete user profiles with skills and projects
-- CV/Resume text storage
-- Target role preferences
-- Update capabilities
+- **Two-Step Onboarding**: Register first, complete profile later
+- **Progress Tracking**: `profile_completed` flag to show onboarding prompts
+- **Flexible Updates**: Update any profile field independently
+- **Complete Profiles**: Skills, projects, education, experience, target roles
+- **CV/Resume Storage**: Raw text for future AI analysis
+- **Career Preferences**: Track preferred career path and target roles
 
 ### 💼 Job Recommendations
 - AI-powered skill-based matching
 - Match score calculation (0-100%)
 - Matched and missing skills identification
+- Detailed job descriptions
+- Salary range information (min-max)
 - Filter by experience level and job type
+- Works even before profile completion
 
 ### 📚 Learning Resources
 - Personalized course recommendations
@@ -93,7 +100,7 @@ createdb -U postgres career_bridge
 # 4. Run schema
 psql -U postgres -d career_bridge -f schema.sql
 
-# 5. (Optional) Seed data
+# 5. Seed data (includes 20 jobs with descriptions & salary ranges)
 psql -U postgres -d career_bridge -f seed_data.sql
 
 # 6. Build and run
@@ -102,6 +109,14 @@ cargo run
 ```
 
 Server starts at: `http://127.0.0.1:3000`
+
+### User Registration Flow
+
+1. **Register** → Provide name, email, password → Get JWT token instantly
+2. **Complete Profile** → Add experience, skills, preferences → Start using platform
+3. **Update Anytime** → Modify profile as career progresses
+
+> 💡 **Tip**: Use `api_tests.http` with VS Code REST Client extension to test all endpoints!
 
 ## 🛠 Tech Stack
 
@@ -184,7 +199,7 @@ http://127.0.0.1:3000
 
 ### Public Endpoints
 
-#### Register User
+#### Register User (Step 1: Simplified Registration)
 ```http
 POST /api/register
 Content-Type: application/json
@@ -192,22 +207,20 @@ Content-Type: application/json
 {
   "full_name": "John Doe",
   "email": "john@example.com",
-  "password": "securepass123",
-  "education_level": "Bachelor's Degree",
-  "experience_level": "junior",
-  "preferred_track": "web_development"
+  "password": "securepass123"
 }
 ```
-
-**Experience Levels**: `fresher`, `junior`, `mid`  
-**Career Tracks**: `web_development`, `data`, `design`, `marketing`
 
 **Response**:
 ```json
 {
-  "message": "User registered successfully"
+  "message": "User registered successfully",
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "user_id": "uuid"
 }
 ```
+
+> 💡 **Note**: User receives JWT token immediately after registration for instant login.
 
 #### Login
 ```http
@@ -228,14 +241,17 @@ Content-Type: application/json
     "id": "uuid",
     "full_name": "John Doe",
     "email": "john@example.com",
-    "experience_level": "junior",
-    "preferred_track": "web_development",
+    "profile_completed": false,
+    "experience_level": null,
+    "preferred_track": null,
     "skills": [],
     "projects": [],
     "target_roles": []
   }
 }
 ```
+
+> 💡 **Note**: Check `profile_completed` flag to show onboarding UI if needed.
 
 ### Protected Endpoints
 
@@ -249,18 +265,50 @@ Authorization: Bearer <your_jwt_token>
 GET /api/profile
 ```
 
+**Response** includes `profile_completed: true/false` to indicate if onboarding is needed.
+
+#### Complete Profile (Step 2: Onboarding)
+```http
+POST /api/profile/complete
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "education_level": "Bachelor's Degree in Computer Science",
+  "experience_level": "junior",
+  "preferred_track": "web_development",
+  "skills": ["JavaScript", "React"],
+  "projects": ["Portfolio Website"],
+  "target_roles": ["Full Stack Developer"]
+}
+```
+
+**Experience Levels**: `fresher`, `junior`, `mid` (case-insensitive)  
+**Career Tracks**: `web_development`, `data`, `design`, `marketing` (case-insensitive)
+
+**Response**:
+```json
+{
+  "message": "Profile completed successfully"
+}
+```
+
 #### Update Profile
 ```http
 PUT /api/profile
 Content-Type: application/json
 
 {
-  "skills": ["JavaScript", "React", "Node.js"],
-  "projects": ["E-commerce Platform"],
-  "target_roles": ["Full Stack Developer"],
+  "full_name": "John Doe",
+  "experience_level": "mid",
+  "skills": ["JavaScript", "React", "Node.js", "TypeScript"],
+  "projects": ["E-commerce Platform", "Task Manager"],
+  "target_roles": ["Full Stack Developer", "Senior Frontend Developer"],
   "raw_cv_text": "My CV content..."
 }
 ```
+
+> 💡 **Note**: All fields optional. Only provided fields are updated.
 
 #### Get Job Recommendations
 ```http
@@ -281,10 +329,14 @@ GET /api/jobs/recommendations?experience_level=junior&limit=10
       "job_title": "Frontend Developer",
       "company": "Tech Corp",
       "location": "Remote",
-      "required_skills": ["JavaScript", "React"],
-      "experience_level": "junior"
+      "job_description": "We are seeking a talented Frontend Developer...",
+      "required_skills": ["JavaScript", "React", "CSS"],
+      "experience_level": "junior",
+      "job_type": "full_time",
+      "salary_min": 60000,
+      "salary_max": 80000
     },
-    "match_score": 85.5,
+    "match_score": 66.7,
     "matched_skills": ["JavaScript", "React"],
     "missing_skills": ["CSS"]
   }
@@ -370,22 +422,28 @@ GET /api/progress
 - `email` (TEXT, UNIQUE)
 - `password_hash` (TEXT)
 - `full_name` (TEXT)
-- `education_level` (TEXT)
-- `experience_level` (ENUM)
-- `preferred_track` (ENUM)
+- `education_level` (TEXT, nullable)
+- `experience_level` (ENUM, nullable until profile completion)
+- `preferred_track` (ENUM, nullable until profile completion)
+- `profile_completed` (BOOLEAN, default: false)
 - `skills` (TEXT[])
 - `projects` (TEXT[])
 - `target_roles` (TEXT[])
 - `raw_cv_text` (TEXT)
+- `created_at` (TIMESTAMPTZ)
+- `updated_at` (TIMESTAMPTZ)
 
 #### jobs
 - `id` (SERIAL, PK)
 - `job_title` (TEXT)
 - `company` (TEXT)
 - `location` (TEXT)
+- `job_description` (TEXT)
 - `required_skills` (TEXT[])
 - `experience_level` (ENUM)
 - `job_type` (ENUM)
+- `salary_min` (INTEGER, nullable)
+- `salary_max` (INTEGER, nullable)
 
 #### learning_resources
 - `id` (SERIAL, PK)
@@ -538,19 +596,21 @@ backend/
 │   ├── handlers/
 │   │   ├── mod.rs             # Router
 │   │   ├── types.rs           # Request/response types
-│   │   ├── auth.rs            # Auth endpoints
-│   │   ├── profile.rs         # Profile endpoints
+│   │   ├── auth.rs            # Auth endpoints (register/login)
+│   │   ├── profile.rs         # Profile endpoints (get/complete/update)
 │   │   ├── jobs.rs            # Job recommendations
 │   │   ├── learning.rs        # Learning resources
 │   │   ├── applications.rs    # Application tracking
 │   │   └── progress.rs        # Progress tracking
-│   ├── models.rs              # Database models
+│   ├── models.rs              # Database models (with case-insensitive enums)
 │   ├── auth.rs                # JWT logic
 │   ├── security.rs            # Password hashing
 │   └── errors.rs              # Error handling
-├── schema.sql                 # Database schema
-├── seed_data.sql              # Sample data
-├── api_tests.http             # API tests
+├── schema.sql                 # Database schema (with profile_completed)
+├── seed_data.sql              # Sample data (20 jobs with descriptions & salaries)
+├── migration_add_profile_completed.sql  # Migration for existing databases
+├── api_tests.http             # API tests (updated for new flow)
+├── MIGRATION_README.md        # Migration guide
 ├── Cargo.toml                 # Dependencies
 └── .env                       # Environment vars
 ```

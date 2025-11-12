@@ -45,6 +45,7 @@ pub async fn get_job_recommendations(
             id, full_name, email, education_level,
             experience_level as "experience_level: ExperienceLevel",
             preferred_track as "preferred_track: CareerTrack",
+            profile_completed as "profile_completed!",
             skills, projects, target_roles, raw_cv_text, password_hash
         FROM users 
         WHERE id = $1
@@ -62,9 +63,10 @@ pub async fn get_job_recommendations(
             Job,
             r#"
             SELECT 
-                id, job_title, company, location, required_skills,
+                id, job_title, company, location, job_description, required_skills,
                 experience_level as "experience_level: ExperienceLevel",
-                job_type as "job_type: JobType"
+                job_type as "job_type: JobType",
+                salary_min, salary_max
             FROM jobs 
             WHERE experience_level = $1
             LIMIT $2
@@ -74,19 +76,37 @@ pub async fn get_job_recommendations(
         )
         .fetch_all(&app_state.db_pool)
         .await?
-    } else {
+    } else if let Some(user_exp_level) = user.experience_level {
         sqlx::query_as!(
             Job,
             r#"
             SELECT 
-                id, job_title, company, location, required_skills,
+                id, job_title, company, location, job_description, required_skills,
                 experience_level as "experience_level: ExperienceLevel",
-                job_type as "job_type: JobType"
+                job_type as "job_type: JobType",
+                salary_min, salary_max
             FROM jobs 
             WHERE experience_level = $1
             LIMIT $2
             "#,
-            user.experience_level as _,
+            user_exp_level as _,
+            limit
+        )
+        .fetch_all(&app_state.db_pool)
+        .await?
+    } else {
+        // If user hasn't completed profile, return all jobs
+        sqlx::query_as!(
+            Job,
+            r#"
+            SELECT 
+                id, job_title, company, location, job_description, required_skills,
+                experience_level as "experience_level: ExperienceLevel",
+                job_type as "job_type: JobType",
+                salary_min, salary_max
+            FROM jobs 
+            LIMIT $1
+            "#,
             limit
         )
         .fetch_all(&app_state.db_pool)

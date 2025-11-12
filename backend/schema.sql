@@ -11,11 +11,12 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     education_level VARCHAR(255),
-    experience_level experience_level NOT NULL,
-    preferred_track career_track NOT NULL,
+    experience_level experience_level,
+    preferred_track career_track,
     skills TEXT[] NOT NULL DEFAULT '{}',
     projects TEXT[] NOT NULL DEFAULT '{}',
     target_roles TEXT[] NOT NULL DEFAULT '{}',
+    profile_completed BOOLEAN DEFAULT FALSE,
     raw_cv_text TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -27,9 +28,12 @@ CREATE TABLE jobs (
     job_title VARCHAR(255) NOT NULL,
     company VARCHAR(255) NOT NULL,
     location VARCHAR(255) NOT NULL,
+    job_description TEXT NOT NULL,
     required_skills TEXT[] NOT NULL DEFAULT '{}',
     experience_level experience_level NOT NULL,
     job_type job_type NOT NULL,
+    salary_min INTEGER,
+    salary_max INTEGER,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

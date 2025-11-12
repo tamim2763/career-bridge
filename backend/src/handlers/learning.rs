@@ -37,6 +37,7 @@ pub async fn get_learning_recommendations(
             id, full_name, email, education_level,
             experience_level as "experience_level: ExperienceLevel",
             preferred_track as "preferred_track: CareerTrack",
+            profile_completed as "profile_completed!",
             skills, projects, target_roles, raw_cv_text, password_hash
         FROM users 
         WHERE id = $1
@@ -131,6 +132,7 @@ pub async fn analyze_skill_gap(
             id, full_name, email, education_level,
             experience_level as "experience_level: ExperienceLevel",
             preferred_track as "preferred_track: CareerTrack",
+            profile_completed as "profile_completed!",
             skills, projects, target_roles, raw_cv_text, password_hash
         FROM users 
         WHERE id = $1
@@ -141,13 +143,15 @@ pub async fn analyze_skill_gap(
     .await?;
 
     // Find jobs matching the target role
+    // Find learning resources that teach skills the user doesn't have yet
     let jobs = sqlx::query_as!(
         Job,
         r#"
         SELECT 
-            id, job_title, company, location, required_skills,
+            id, job_title, company, location, job_description, required_skills,
             experience_level as "experience_level: ExperienceLevel",
-            job_type as "job_type: JobType"
+            job_type as "job_type: JobType",
+            salary_min, salary_max
         FROM jobs 
         WHERE LOWER(job_title) LIKE LOWER($1)
         LIMIT 5

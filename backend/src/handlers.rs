@@ -45,6 +45,7 @@ pub fn create_router(app_state: AppState) -> Router {
         
         // Protected routes - Profile
         .route("/api/profile", get(profile::get_profile))
+        .route("/api/profile/complete", post(profile::complete_profile))
         .route("/api/profile", put(profile::update_profile))
         
         // Protected routes - Job Recommendations

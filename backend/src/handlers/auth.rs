@@ -9,9 +9,11 @@ use crate::auth::create_jwt;
 use crate::AppState;
 use super::types::{RegisterPayload, LoginPayload, LoginResponse, UserProfile};
 
-/// Registers a new user account.
+/// Registers a new user account with simplified onboarding.
 /// 
-/// Creates a new user with hashed password and profile information.
+/// Creates a new user with only name, email, and hashed password.
+/// The user can complete their profile later via the profile completion endpoint.
+/// Returns a JWT token for immediate authentication.
 /// 
 /// # Errors
 /// 
@@ -19,6 +21,7 @@ use super::types::{RegisterPayload, LoginPayload, LoginResponse, UserProfile};
 /// - Validation fails (invalid email, short password, etc.)
 /// - Email is already registered (unique constraint violation)
 /// - Database operation fails
+/// - JWT token generation fails
 pub async fn register(
     State(app_state): State<AppState>,
     Json(payload): Json<RegisterPayload>,
@@ -29,32 +32,34 @@ pub async fn register(
 
     let hashed_password = hash_password(payload.password).await?;
     
-    sqlx::query!(
+    let user_id = sqlx::query_scalar!(
         r#"
-        INSERT INTO users (
-            full_name, email, password_hash, education_level, 
-            experience_level, preferred_track
-        )
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO users (full_name, email, password_hash)
+        VALUES ($1, $2, $3)
+        RETURNING id
         "#,
         payload.full_name,
         payload.email,
-        hashed_password,
-        payload.education_level,
-        payload.experience_level as _,
-        payload.preferred_track as _
+        hashed_password
     )
-    .execute(&app_state.db_pool)
+    .fetch_one(&app_state.db_pool)
     .await?;
 
+    // Generate JWT token for immediate login
+    let token = create_jwt(user_id, payload.email.clone())?;
+
     Ok(Json(serde_json::json!({
-        "message": "User registered successfully"
+        "message": "User registered successfully",
+        "token": token,
+        "user_id": user_id
     })))
 }
 
-/// Authenticates a user and returns a JWT token.
+/// Authenticates a user and returns a JWT token with profile information.
 /// 
 /// Verifies email and password, then generates a JWT token for authenticated requests.
+/// Returns user profile including `profile_completed` status to determine if
+/// onboarding is required.
 /// 
 /// # Errors
 /// 
@@ -79,6 +84,7 @@ pub async fn login(
             id, full_name, email, education_level,
             experience_level as "experience_level: ExperienceLevel",
             preferred_track as "preferred_track: CareerTrack",
+            profile_completed as "profile_completed!",
             skills, projects, target_roles, raw_cv_text, password_hash
         FROM users 
         WHERE email = $1
@@ -104,6 +110,7 @@ pub async fn login(
             id: user.id,
             full_name: user.full_name,
             email: user.email,
+            profile_completed: user.profile_completed,
             education_level: user.education_level,
             experience_level: user.experience_level,
             preferred_track: user.preferred_track,
