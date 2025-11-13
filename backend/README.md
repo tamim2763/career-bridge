@@ -14,6 +14,7 @@
 - [Code Documentation](#-code-documentation)
 - [Algorithms](#-algorithms)
 - [Testing](#-testing)
+- [Logging & Monitoring](#-logging--monitoring)
 - [Troubleshooting](#-troubleshooting)
 - [Deployment](#-deployment)
 
@@ -24,11 +25,6 @@ CareerBridge helps users achieve career goals through:
 - 💼 **Smart Job Matching** - AI-powered recommendations
 - 📚 **Personalized Learning** - Curated courses and resources
 - 📊 **Progress Tracking** - Monitor applications and learning
-
-### SDG 8 Alignment
-- **8.5** - Full Employment (job matching, application tracking)
-- **8.6** - Youth Employment (learning resources, skill development)
-- **8.b** - Global Jobs Pact (multi-track support)
 
 ## ✨ Features
 
@@ -611,38 +607,72 @@ DATABASE_URL=postgresql://user:pass@host:port/dbname
 JWT_SECRET=production-secret-key
 ```
 
+## 📝 Logging & Monitoring
+
+The application includes comprehensive tracing logs for debugging and monitoring:
+
+### Log Levels
+- **INFO** - Business operations, user actions, successful completions
+- **DEBUG** - Detailed information (query params, intermediate values)
+- **WARN** - User errors, validation failures, duplicate actions
+- **ERROR** - System errors, database failures requiring investigation
+
+### What's Logged
+✅ All user registration and login attempts (success/failure)  
+✅ Profile operations (creation, updates, completions)  
+✅ Job and learning recommendations (with match scores)  
+✅ Application and progress tracking events  
+✅ OAuth flows (Google/GitHub authentication)  
+✅ Database operations and errors  
+✅ Server startup and configuration  
+
+### Smart Error Handling
+User errors (validation, duplicates) are logged at WARN level, while system errors are logged at ERROR level. Users receive friendly messages instead of raw database errors.
+
+**Example:**
+```
+WARN  Registration failed: Email already exists - user@example.com
+Response: "An account with this email already exists. Please login or use a different email."
+```
+
+### Configuration
+Change log level in `main.rs` or via environment:
+```bash
+RUST_LOG=debug cargo run   # Debug level
+RUST_LOG=info cargo run    # Default (recommended)
+```
+
 ## 📊 Project Structure
 
 ```
 backend/
 ├── src/
-│   ├── main.rs                # Entry point
+│   ├── main.rs                # Entry point with startup logs
 │   ├── lib.rs                 # Crate docs
+│   ├── handlers.rs            # Router with route logging
 │   ├── handlers/
-│   │   ├── mod.rs             # Router
 │   │   ├── types.rs           # Request/response types
-│   │   ├── auth.rs            # Auth endpoints (register/login)
-│   │   ├── profile.rs         # Profile endpoints (get/complete/update)
-│   │   ├── jobs.rs            # Job recommendations
-│   │   ├── learning.rs        # Learning resources
-│   │   ├── applications.rs    # Application tracking
-│   │   └── progress.rs        # Progress tracking
-│   ├── models.rs              # Database models (with case-insensitive enums)
+│   │   ├── auth.rs            # Auth endpoints (with logs)
+│   │   ├── profile.rs         # Profile endpoints (with logs)
+│   │   ├── jobs.rs            # Job recommendations (with logs)
+│   │   ├── learning.rs        # Learning resources (with logs)
+│   │   ├── applications.rs    # Application tracking (with logs)
+│   │   ├── progress.rs        # Progress tracking (with logs)
+│   │   └── oauth.rs           # OAuth handlers (comprehensive logs)
+│   ├── models.rs              # Database models
 │   ├── auth.rs                # JWT logic
 │   ├── security.rs            # Password hashing
-│   └── errors.rs              # Error handling
-├── schema.sql                 # Database schema (with profile_completed)
-├── seed_data.sql              # Sample data (20 jobs with descriptions & salaries)
-├── migration_add_profile_completed.sql  # Migration for existing databases
-├── api_tests.http             # API tests (updated for new flow)
-├── MIGRATION_README.md        # Migration guide
+│   └── errors.rs              # Error handling with smart logging
+├── schema.sql                 # Database schema
+├── seed_data.sql              # Sample data
+├── api_tests.http             # API tests
 ├── Cargo.toml                 # Dependencies
 └── .env                       # Environment vars
 ```
 
 ## 🤝 Contributing
 
-SDG 8 Hackathon project. Contributions welcome!
+Contributions welcome!
 
 ## 📄 License
 
@@ -650,4 +680,4 @@ MIT License
 
 ---
 
-**Built with ❤️ using Rust** | **Version 0.1.0** | **Status: Production Ready** ✅
+**Built with ❤️ using Rust** | **Version 0.1.0** | **XO9A8** 
