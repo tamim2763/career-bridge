@@ -1,11 +1,16 @@
 "use client"
 
 import { useState } from "react"
+import dynamic from "next/dynamic"
 import Navbar from "@/components/Navbar"
 import ResourceCard from "@/components/ResourceCard"
-import Footer from "@/components/Footer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Filter, BookOpen } from "lucide-react"
+
+// Lazy load Footer
+const Footer = dynamic(() => import("@/components/Footer"), {
+  loading: () => <div className="h-32" />,
+});
 
 const allResources = [
   {

@@ -1,10 +1,15 @@
 "use client"
 
 import { useState } from "react"
+import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
 import { Button } from "@/components/ui/button"
+
+// Lazy load Footer
+const Footer = dynamic(() => import("@/components/Footer"), {
+  loading: () => <div className="h-32" />,
+});
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"

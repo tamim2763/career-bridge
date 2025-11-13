@@ -1,14 +1,21 @@
 "use client"
 
 import { useState } from "react"
+import dynamic from "next/dynamic"
 import Navbar from "@/components/Navbar"
 import JobCard from "@/components/JobCard"
-import JobDetailsModal from "@/components/JobDetailsModal"
-import Footer from "@/components/Footer"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
+
+// Lazy load heavy components
+const JobDetailsModal = dynamic(() => import("@/components/JobDetailsModal"), {
+  ssr: false,
+});
+const Footer = dynamic(() => import("@/components/Footer"), {
+  loading: () => <div className="h-32" />,
+});
 
 const allJobs = [
   {

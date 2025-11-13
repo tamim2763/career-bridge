@@ -12,7 +12,7 @@ export default function Template({ children }: { children: ReactNode }) {
       transition={{
         type: "tween",
         ease: "easeInOut",
-        duration: 0.3,
+        duration: 0.2, // Reduced from 0.3 for faster transitions
       }}
     >
       {children}

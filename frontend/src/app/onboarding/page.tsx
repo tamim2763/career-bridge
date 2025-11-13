@@ -2,7 +2,16 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import OnboardingFlow from "@/components/OnboardingFlow"
+import dynamic from "next/dynamic"
+
+// Lazy load OnboardingFlow
+const OnboardingFlow = dynamic(() => import("@/components/OnboardingFlow"), {
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-pulse text-muted-foreground">Loading...</div>
+    </div>
+  ),
+});
 
 export default function OnboardingPage() {
   const router = useRouter()

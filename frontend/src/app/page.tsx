@@ -1,12 +1,19 @@
 "use client"
 
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Briefcase, Target, BookOpen, TrendingUp, Sparkles, ArrowRight, CheckCircle } from "lucide-react"
-import Footer from "@/components/Footer"
-import TestimonialScroll from "@/components/TestimonialScroll"
 import ThemeToggle from "@/components/ThemeToggle"
+
+// Lazy load heavy components
+const Footer = dynamic(() => import("@/components/Footer"), {
+  loading: () => <div className="h-32" />, // Placeholder to prevent layout shift
+});
+const TestimonialScroll = dynamic(() => import("@/components/TestimonialScroll"), {
+  loading: () => <div className="h-64" />, // Placeholder to prevent layout shift
+});
 
 export default function Home() {
   return (
