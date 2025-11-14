@@ -64,17 +64,25 @@ pub async fn get_learning_recommendations(
     .fetch_all(&app_state.db_pool)
     .await?;
 
-    // Calculate relevance scores
-    let user_skills_set: std::collections::HashSet<_> = user.skills.iter().collect();
+    // Calculate relevance scores (case-insensitive comparison)
+    let user_skills_lower: std::collections::HashSet<String> = user.skills
+        .iter()
+        .map(|s| s.to_lowercase())
+        .collect();
 
     let mut recommendations: Vec<ResourceRecommendation> = resources.into_iter()
         .map(|resource| {
-            let resource_skills_set: std::collections::HashSet<_> = resource.related_skills.iter().collect();
+            // Create case-insensitive mapping for resource skills
+            let resource_skills_lower: std::collections::HashMap<String, String> = resource.related_skills
+                .iter()
+                .map(|s| (s.to_lowercase(), s.clone()))
+                .collect();
+            let resource_skills_set: std::collections::HashSet<String> = resource_skills_lower.keys().cloned().collect();
             
-            // Skills user doesn't have but resource teaches
+            // Skills user doesn't have but resource teaches (case-insensitive comparison)
             let new_skills: Vec<String> = resource_skills_set
-                .difference(&user_skills_set)
-                .map(|s| s.to_string())
+                .difference(&user_skills_lower)
+                .filter_map(|lower_key| resource_skills_lower.get(lower_key).cloned())
                 .collect();
             
             // Relevance based on how many new skills it teaches
@@ -179,17 +187,30 @@ pub async fn analyze_skill_gap(
     }
 
     let required_skills: Vec<String> = all_required_skills.into_iter().collect();
-    let user_skills_set: std::collections::HashSet<_> = user.skills.iter().cloned().collect();
-    let required_skills_set: std::collections::HashSet<_> = required_skills.iter().cloned().collect();
+    
+    // Create case-insensitive skill sets for comparison
+    let user_skills_lower: std::collections::HashMap<String, String> = user.skills
+        .iter()
+        .map(|s| (s.to_lowercase(), s.clone()))
+        .collect();
+    let required_skills_lower: std::collections::HashMap<String, String> = required_skills
+        .iter()
+        .map(|s| (s.to_lowercase(), s.clone()))
+        .collect();
+    
+    let user_skills_set: std::collections::HashSet<String> = user_skills_lower.keys().cloned().collect();
+    let required_skills_set: std::collections::HashSet<String> = required_skills_lower.keys().cloned().collect();
 
+    // Find matching skills (case-insensitive comparison, but preserve user's original case)
     let matching_skills: Vec<String> = user_skills_set
         .intersection(&required_skills_set)
-        .cloned()
+        .filter_map(|lower_key| user_skills_lower.get(lower_key).cloned())
         .collect();
 
+    // Find skill gaps (case-insensitive comparison, but preserve original case)
     let skill_gaps: Vec<String> = required_skills_set
         .difference(&user_skills_set)
-        .cloned()
+        .filter_map(|lower_key| required_skills_lower.get(lower_key).cloned())
         .collect();
 
     let match_percentage = if !required_skills.is_empty() {

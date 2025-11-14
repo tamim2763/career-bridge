@@ -128,6 +128,29 @@ pub struct JobRecommendation {
     pub matched_skills: Vec<String>,
     /// Skills required by job that user doesn't have
     pub missing_skills: Vec<String>,
+    /// Human-readable explanation of the match
+    pub match_explanation: String,
+    /// Key strengths (why it's a good match)
+    pub strengths: Vec<String>,
+    /// Areas for improvement
+    pub improvement_areas: Vec<String>,
+    /// Experience level alignment score (0-100)
+    pub experience_alignment: f64,
+    /// Track alignment score (0-100)
+    pub track_alignment: f64,
+    /// Skill overlap score (0-100)
+    pub skill_overlap: f64,
+    /// Platform links for applying
+    pub platform_links: PlatformLinks,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PlatformLinks {
+    pub linkedin: String,
+    pub bdjobs: String,
+    pub glassdoor: String,
+    pub indeed: String,
+    pub rojgari: Option<String>, // Optional for Bangladesh-specific
 }
 
 /// Learning resource recommendation with relevance scoring.

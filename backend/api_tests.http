@@ -121,6 +121,25 @@ Content-Type: application/pdf
 ### JOB RECOMMENDATIONS (Protected Routes)
 ### ============================================================================
 
+```http
+### Get Enhanced Job Recommendations
+GET {{baseUrl}}/jobs/recommendations
+Authorization: Bearer {{auth_token}}
+
+### Expected Response:
+# {
+#   "job": {...},
+#   "match_score": 72.5,
+#   "match_explanation": "Good match! You have 5 of 7 required skills...",
+#   "strengths": ["Strong skills match: React, JavaScript", ...],
+#   "improvement_areas": ["Learn: Redux, TypeScript"],
+#   "platform_links": {
+#     "linkedin": "https://...",
+#     "bdjobs": "https://...",
+#     ...
+#   }
+# }
+
 ### Get Job Recommendations (All)
 GET {{baseUrl}}/jobs/recommendations
 Authorization: Bearer {{token}}

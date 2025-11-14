@@ -96,6 +96,23 @@ export interface LearningRecommendation {
   new_skills: string[];
 }
 
+export interface SkillGapAnalysis {
+  user_skills: string[];
+  target_role: string;
+  required_skills: string[];
+  skill_gaps: string[];
+  matching_skills: string[];
+  match_percentage: number;
+  recommended_resources: {
+    id: number;
+    title: string;
+    platform: string;
+    url: string;
+    related_skills: string[];
+    cost: 'free' | 'paid';
+  }[];
+}
+
 // Authentication APIs
 export const authApi = {
   // Register new user
@@ -335,6 +352,28 @@ export const learningApi = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to fetch learning recommendations');
+    }
+
+    return await response.json();
+  },
+
+  // Analyze skill gap for a target role
+  analyzeSkillGap: async (targetRole: string): Promise<SkillGapAnalysis> => {
+    const token = getToken();
+    // URL encode the target role for the path parameter
+    const encodedRole = encodeURIComponent(targetRole);
+    const response = await fetch(`${API_BASE_URL}/skill-gap/${encodedRole}`, {
+      headers: getHeaders(token),
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem('authToken');
+      throw new Error('Session expired. Please login again.');
+    }
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to analyze skill gap');
     }
 
     return await response.json();

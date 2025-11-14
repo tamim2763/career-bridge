@@ -6,7 +6,8 @@ use crate::models::{User, Job, ExperienceLevel, CareerTrack, JobType};
 use crate::errors::AppResult;
 use crate::auth::AuthUser;
 use crate::AppState;
-use super::types::{JobQueryParams, JobRecommendation};
+use super::types::{JobQueryParams, JobRecommendation, PlatformLinks};
+use crate::ai_matching::{calculate_enhanced_match, generate_ai_explanation};
 
 /// Gets job recommendations for the authenticated user.
 /// 
@@ -81,7 +82,7 @@ pub async fn get_job_recommendations(
         )
         .fetch_all(&app_state.db_pool)
         .await?
-    } else if let Some(user_exp_level) = user.experience_level {
+    } else if let Some(ref user_exp_level) = user.experience_level {
         sqlx::query_as!(
             Job,
             r#"
@@ -94,7 +95,7 @@ pub async fn get_job_recommendations(
             WHERE experience_level = $1
             LIMIT $2
             "#,
-            user_exp_level as _,
+            *user_exp_level as _,
             limit
         )
         .fetch_all(&app_state.db_pool)
@@ -119,35 +120,108 @@ pub async fn get_job_recommendations(
     };
 
     // Calculate match scores
-    let mut recommendations: Vec<JobRecommendation> = jobs.into_iter()
-        .map(|job| {
-            let user_skills_set: std::collections::HashSet<_> = user.skills.iter().collect();
-            let job_skills_set: std::collections::HashSet<_> = job.required_skills.iter().collect();
-            
-            let matched: Vec<String> = user_skills_set
-                .intersection(&job_skills_set)
-                .map(|s| s.to_string())
-                .collect();
-            
-            let missing: Vec<String> = job_skills_set
-                .difference(&user_skills_set)
-                .map(|s| s.to_string())
-                .collect();
-            
-            let match_score = if !job.required_skills.is_empty() {
-                (matched.len() as f64 / job.required_skills.len() as f64) * 100.0
-            } else {
-                0.0
-            };
+    let mut recommendations: Vec<JobRecommendation> = Vec::new();
+    
+    for job in jobs {
+        let user_skills_set: std::collections::HashSet<_> = user.skills.iter().collect();
+        let job_skills_set: std::collections::HashSet<_> = job.required_skills.iter().collect();
+        
+        let matched: Vec<String> = user_skills_set
+            .intersection(&job_skills_set)
+            .map(|s| s.to_string())
+            .collect();
+        
+        let missing: Vec<String> = job_skills_set
+            .difference(&user_skills_set)
+            .map(|s| s.to_string())
+            .collect();
+        
+        // Calculate enhanced match using heuristic
+        let enhanced = calculate_enhanced_match(
+            &user.skills,
+            &job.required_skills,
+            user.experience_level.as_ref().map(|e| match e {
+                ExperienceLevel::Fresher => "fresher",
+                ExperienceLevel::Junior => "junior",
+                ExperienceLevel::Mid => "mid",
+            }),
+            match job.experience_level {
+                ExperienceLevel::Fresher => "fresher",
+                ExperienceLevel::Junior => "junior",
+                ExperienceLevel::Mid => "mid",
+            },
+            user.preferred_track.as_ref().map(|t| match t {
+                CareerTrack::WebDevelopment => "web_development",
+                CareerTrack::Data => "data",
+                CareerTrack::Design => "design",
+                CareerTrack::Marketing => "marketing",
+            }),
+            &job.job_title,
+        );
+        
+        // Try to enhance explanation with AI (falls back to heuristic if AI fails)
+        let ai_enhanced_explanation = generate_ai_explanation(
+            &user.skills,
+            &job.required_skills,
+            user.experience_level.as_ref().map(|e| match e {
+                ExperienceLevel::Fresher => "fresher",
+                ExperienceLevel::Junior => "junior",
+                ExperienceLevel::Mid => "mid",
+            }),
+            match job.experience_level {
+                ExperienceLevel::Fresher => "fresher",
+                ExperienceLevel::Junior => "junior",
+                ExperienceLevel::Mid => "mid",
+            },
+            user.preferred_track.as_ref().map(|t| match t {
+                CareerTrack::WebDevelopment => "web_development",
+                CareerTrack::Data => "data",
+                CareerTrack::Design => "design",
+                CareerTrack::Marketing => "marketing",
+            }),
+            &job.job_title,
+            &job.job_description,
+            enhanced.match_score,
+            enhanced.skill_overlap,
+            enhanced.experience_alignment,
+            enhanced.track_alignment,
+        ).await;
+        
+        // Generate platform links
+        let encoded_title = urlencoding::encode(&job.job_title);
+        let encoded_location = urlencoding::encode(&job.location);
+        
+        let platform_links = PlatformLinks {
+            linkedin: format!("https://www.linkedin.com/jobs/search/?keywords={}&location={}", 
+                encoded_title, encoded_location),
+            bdjobs: format!("https://jobs.bdjobs.com/jobsearch.asp?txtKeyword={}&fcatId=8", 
+                encoded_title),
+            glassdoor: format!("https://www.glassdoor.com/Job/jobs.htm?sc.keyword={}", 
+                encoded_title),
+            indeed: format!("https://www.indeed.com/jobs?q={}&l={}", 
+                encoded_title, encoded_location),
+            rojgari: None,
+        };
+        
+        recommendations.push(JobRecommendation {
+            job,
+            match_score: enhanced.match_score,
+            matched_skills: matched,
+            missing_skills: missing,
+            match_explanation: ai_enhanced_explanation,
+            strengths: enhanced.strengths,
+            improvement_areas: enhanced.improvement_areas,
+            experience_alignment: enhanced.experience_alignment,
+            track_alignment: enhanced.track_alignment,
+            skill_overlap: enhanced.skill_overlap,
+            platform_links,
+        });
+    }
 
-            JobRecommendation {
-                job,
-                match_score,
-                matched_skills: matched,
-                missing_skills: missing,
-            }
-        })
-        .collect();
+    // Filter recommendations by minimum match score threshold (50% - industry standard)
+    // This ensures users only see jobs that are reasonably relevant to their profile
+    const MIN_MATCH_THRESHOLD: f64 = 50.0;
+    recommendations.retain(|rec| rec.match_score >= MIN_MATCH_THRESHOLD);
 
     // Sort by match score descending
     recommendations.sort_by(|a, b| b.match_score.partial_cmp(&a.match_score).unwrap());

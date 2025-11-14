@@ -1,10 +1,14 @@
 "use client"
 
-import { X, MapPin, Briefcase, Clock, Building2, DollarSign, Users, Bookmark } from "lucide-react"
+import { X, MapPin, Briefcase, Clock, Building2, DollarSign, Users, Bookmark, Target, TrendingUp, CheckCircle2, AlertCircle, ExternalLink, Linkedin, Globe } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Progress } from "@/components/ui/progress"
+import { Separator } from "@/components/ui/separator"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
 
 interface JobDetailsModalProps {
   open: boolean
@@ -23,15 +27,36 @@ interface JobDetailsModalProps {
     responsibilities: string[]
     requirements: string[]
     benefits?: string[]
+    matchScore?: number
+    matchExplanation?: string
+    strengths?: string[]
+    improvementAreas?: string[]
+    experienceAlignment?: number
+    trackAlignment?: number
+    skillOverlap?: number
+    platformLinks?: {
+      linkedin: string
+      bdjobs: string
+      glassdoor: string
+      indeed: string
+    }
   } | null
 }
 
 export default function JobDetailsModal({ open, onClose, job }: JobDetailsModalProps) {
+  const router = useRouter()
+  
   if (!job) return null
 
   const handleSaveJob = () => {
     // Placeholder for save functionality
     alert(`Job "${job.title}" saved!`)
+  }
+
+  const handleAnalyzeSkills = () => {
+    onClose()
+    // Navigate to skill gap page with the job title pre-filled
+    router.push(`/skill-gap?role=${encodeURIComponent(job.title)}`)
   }
 
   return (
@@ -164,11 +189,169 @@ export default function JobDetailsModal({ open, onClose, job }: JobDetailsModalP
               </div>
             )}
 
+            {/* Match Score Card */}
+            {job.matchScore != null && !isNaN(job.matchScore) && (
+              <>
+                <Separator className="my-6" />
+                <Card className="border-green-200/50 dark:border-green-500/30 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/30 dark:to-emerald-950/30">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-green-500" />
+                        <CardTitle className="text-xl">Match Score</CardTitle>
+                      </div>
+                      <Badge className="text-lg font-bold px-4 py-1 bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/50">
+                        {job.matchScore.toFixed(0)}%
+                      </Badge>
+                    </div>
+                    {job.matchExplanation && (
+                      <CardDescription className="text-sm text-muted-foreground mt-2">
+                        {job.matchExplanation}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Match Breakdown */}
+                    <div className="space-y-3">
+                      {job.skillOverlap !== undefined && (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Skill Overlap</span>
+                            <span className="font-medium">{job.skillOverlap.toFixed(0)}%</span>
+                          </div>
+                          <Progress value={job.skillOverlap} className="h-2" />
+                        </div>
+                      )}
+                      {job.experienceAlignment !== undefined && (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Experience Alignment</span>
+                            <span className="font-medium">{job.experienceAlignment.toFixed(0)}%</span>
+                          </div>
+                          <Progress value={job.experienceAlignment} className="h-2" />
+                        </div>
+                      )}
+                      {job.trackAlignment !== undefined && (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Career Track Alignment</span>
+                            <span className="font-medium">{job.trackAlignment.toFixed(0)}%</span>
+                          </div>
+                          <Progress value={job.trackAlignment} className="h-2" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Strengths */}
+                    {job.strengths && job.strengths.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-green-500" />
+                          Key Strengths
+                        </h4>
+                        <ul className="space-y-1.5">
+                          {job.strengths.map((strength, index) => (
+                            <li key={index} className="flex items-start space-x-2 text-sm text-muted-foreground">
+                              <span className="text-green-400 mt-1">✓</span>
+                              <span>{strength}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Improvement Areas */}
+                    {job.improvementAreas && job.improvementAreas.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4 text-orange-500" />
+                          Areas for Improvement
+                        </h4>
+                        <ul className="space-y-1.5">
+                          {job.improvementAreas.map((area, index) => (
+                            <li key={index} className="flex items-start space-x-2 text-sm text-muted-foreground">
+                              <span className="text-orange-400 mt-1">•</span>
+                              <span>{area}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            {/* Platform Links */}
+            {job.platformLinks && (
+              <>
+                <Separator className="my-6" />
+                <Card className="border-blue-200/50 dark:border-blue-500/30 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/30 dark:to-indigo-950/30">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-blue-500" />
+                      Apply on Job Platforms
+                    </CardTitle>
+                    <CardDescription>
+                      Find this job on popular job search platforms
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Button
+                        variant="outline"
+                        className="justify-start border-blue-200/50 dark:border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+                        onClick={() => window.open(job.platformLinks!.linkedin, '_blank')}
+                      >
+                        <Linkedin className="w-4 h-4 mr-2 text-blue-600" />
+                        LinkedIn
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="justify-start border-blue-200/50 dark:border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+                        onClick={() => window.open(job.platformLinks!.bdjobs, '_blank')}
+                      >
+                        <Globe className="w-4 h-4 mr-2 text-green-600" />
+                        BDjobs
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="justify-start border-blue-200/50 dark:border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+                        onClick={() => window.open(job.platformLinks!.glassdoor, '_blank')}
+                      >
+                        <Globe className="w-4 h-4 mr-2 text-purple-600" />
+                        Glassdoor
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="justify-start border-blue-200/50 dark:border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+                        onClick={() => window.open(job.platformLinks!.indeed, '_blank')}
+                      >
+                        <Globe className="w-4 h-4 mr-2 text-indigo-600" />
+                        Indeed
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button
+                onClick={handleAnalyzeSkills}
+                className="flex-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium shadow-lg hover:shadow-purple-500/50 transition-all duration-300"
+              >
+                <Target className="w-4 h-4 mr-2" />
+                Analyze Skills
+              </Button>
+              <Button
                 onClick={handleSaveJob}
-                className="flex-1 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium shadow-lg hover:shadow-blue-500/50 transition-all duration-300 animate-glow"
+                className="flex-1 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
               >
                 <Bookmark className="w-4 h-4 mr-2" />
                 Save Job

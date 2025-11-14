@@ -5,7 +5,9 @@ import dynamic from "next/dynamic"
 import Navbar from "@/components/Navbar"
 import JobCard from "@/components/JobCard"
 import ResourceCard from "@/components/ResourceCard"
-import { GraduationCap, Briefcase, Target, TrendingUp } from "lucide-react"
+import { GraduationCap, Briefcase, Target, TrendingUp, ArrowRight } from "lucide-react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { profileApi, jobsApi, learningApi } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -65,9 +67,16 @@ export default function DashboardPage() {
             responsibilities: item.job.responsibilities || [],
             requirements: item.job.requirements || [],
             benefits: item.job.benefits || [],
-            matchScore: item.match_score,
+            matchScore: item.match_score ?? null,
             matchedSkills: item.matched_skills || [],
             missingSkills: item.missing_skills || [],
+            matchExplanation: item.match_explanation || null,
+            strengths: item.strengths || [],
+            improvementAreas: item.improvement_areas || [],
+            experienceAlignment: item.experience_alignment ?? null,
+            trackAlignment: item.track_alignment ?? null,
+            skillOverlap: item.skill_overlap ?? null,
+            platformLinks: item.platform_links || null,
           }
         })
 
@@ -170,13 +179,42 @@ export default function DashboardPage() {
                   <TrendingUp className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">85%</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    {jobs.length > 0 
+                      ? `${Math.round(jobs.reduce((sum, job) => sum + (job.matchScore || 0), 0) / jobs.length)}%`
+                      : 'N/A'}
+                  </p>
                   <p className="text-xs text-muted-foreground">Profile Match</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Skill Gap Analysis CTA */}
+        <section className="mb-12">
+          <div className="glass-effect rounded-xl p-6 border border-purple-200/50 dark:border-purple-500/30 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-950/30 dark:to-pink-950/30 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-start gap-4 flex-1">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center flex-shrink-0">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">Analyze Your Skill Gaps</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Discover what skills you need to land your dream job and get personalized learning recommendations
+                  </p>
+                </div>
+              </div>
+              <Link href="/skill-gap">
+                <Button className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium shadow-lg hover:shadow-purple-500/50 transition-all duration-300 whitespace-nowrap">
+                  Analyze Skills
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
 
         {/* Recommended Jobs Section */}
         <section className="mb-12">

@@ -56,9 +56,16 @@ export default function JobsPage() {
             responsibilities: item.job.responsibilities || [],
             requirements: item.job.requirements || [],
             benefits: item.job.benefits || [],
-            matchScore: item.match_score,
+            matchScore: item.match_score ?? null,
             matchedSkills: item.matched_skills || [],
             missingSkills: item.missing_skills || [],
+            matchExplanation: item.match_explanation || null,
+            strengths: item.strengths || [],
+            improvementAreas: item.improvement_areas || [],
+            experienceAlignment: item.experience_alignment ?? null,
+            trackAlignment: item.track_alignment ?? null,
+            skillOverlap: item.skill_overlap ?? null,
+            platformLinks: item.platform_links || null,
           }
         })
 

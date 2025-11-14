@@ -86,6 +86,7 @@ pub mod handlers;
 pub mod models;
 pub mod security;
 pub mod auth;
+pub mod ai_matching;
 
 /// Application state shared across all request handlers.
 /// 

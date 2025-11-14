@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Menu, X, Briefcase, BookOpen, User, LayoutDashboard, LogOut, Sparkles } from "lucide-react"
+import { Menu, X, Briefcase, BookOpen, User, LayoutDashboard, LogOut, Sparkles, Target } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import ThemeToggle from "@/components/ThemeToggle"
@@ -35,6 +35,7 @@ export default function Navbar() {
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/jobs", label: "Jobs", icon: Briefcase },
     { href: "/resources", label: "Resources", icon: BookOpen },
+    { href: "/skill-gap", label: "Skill Gap", icon: Target },
     { href: "/profile", label: "Profile", icon: User },
   ]
 

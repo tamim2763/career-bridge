@@ -1,9 +1,10 @@
 "use client"
 
-import { MapPin, Briefcase, Clock } from "lucide-react"
+import { MapPin, Briefcase, Clock, TrendingUp } from "lucide-react"
 import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
 
 interface JobCardProps {
   id: string
@@ -13,6 +14,7 @@ interface JobCardProps {
   type: string
   skills: string[]
   postedDate: string
+  matchScore?: number
   onViewDetails: (id: string) => void
 }
 
@@ -24,6 +26,7 @@ export default function JobCard({
   type,
   skills,
   postedDate,
+  matchScore,
   onViewDetails,
 }: JobCardProps) {
   return (
@@ -41,13 +44,32 @@ export default function JobCard({
             </h3>
             <p className="text-sm text-muted-foreground font-medium">{company}</p>
           </div>
-          <Badge
-            variant="secondary"
-            className="text-xs font-medium px-3 py-1 border border-blue-500/50 dark:border-blue-500/30 bg-blue-100/50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300"
-          >
-            {type}
-          </Badge>
+          <div className="flex flex-col items-end gap-2">
+            <Badge
+              variant="secondary"
+              className="text-xs font-medium px-3 py-1 border border-blue-500/50 dark:border-blue-500/30 bg-blue-100/50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300"
+            >
+              {type}
+            </Badge>
+            {matchScore != null && !isNaN(matchScore) && (
+              <Badge
+                variant="secondary"
+                className="text-xs font-semibold px-2.5 py-1 border border-green-500/50 dark:border-green-500/30 bg-green-100/50 dark:bg-green-500/20 text-green-700 dark:text-green-300 flex items-center gap-1"
+              >
+                <TrendingUp className="w-3 h-3" />
+                {matchScore.toFixed(0)}% Match
+              </Badge>
+            )}
+          </div>
         </div>
+
+        {/* Match Score Progress Bar */}
+        {matchScore != null && !isNaN(matchScore) && (
+          <div className="space-y-1">
+            <Progress value={matchScore} className="h-2" />
+            <p className="text-xs text-muted-foreground">Match score based on your profile</p>
+          </div>
+        )}
 
         {/* Location and Time */}
         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
