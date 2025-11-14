@@ -335,6 +335,104 @@ export const jobsApi = {
   },
 };
 
+// External Jobs APIs (NGO, Government, Local Boards)
+export interface ExternalJob {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  description: string;
+  url: string;
+  posted_date: string;
+  source: string;
+  job_type: string | null;
+  experience_level: string | null;
+  skills: string[];
+  salary: string | null;
+}
+
+export const externalJobsApi = {
+  // Get all external jobs
+  getAll: async (): Promise<ExternalJob[]> => {
+    const token = getToken();
+    const response = await fetch(`${API_BASE_URL}/jobs/external`, {
+      headers: getHeaders(token),
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem('authToken');
+      throw new Error('Session expired. Please login again.');
+    }
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch external jobs');
+    }
+
+    return await response.json();
+  },
+
+  // Get NGO jobs from ReliefWeb
+  getNGO: async (): Promise<ExternalJob[]> => {
+    const token = getToken();
+    const response = await fetch(`${API_BASE_URL}/jobs/ngo`, {
+      headers: getHeaders(token),
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem('authToken');
+      throw new Error('Session expired. Please login again.');
+    }
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch NGO jobs');
+    }
+
+    return await response.json();
+  },
+
+  // Get government portal jobs
+  getGovt: async (): Promise<ExternalJob[]> => {
+    const token = getToken();
+    const response = await fetch(`${API_BASE_URL}/jobs/govt`, {
+      headers: getHeaders(token),
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem('authToken');
+      throw new Error('Session expired. Please login again.');
+    }
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch government jobs');
+    }
+
+    return await response.json();
+  },
+
+  // Get local job board listings
+  getLocal: async (): Promise<ExternalJob[]> => {
+    const token = getToken();
+    const response = await fetch(`${API_BASE_URL}/jobs/local`, {
+      headers: getHeaders(token),
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem('authToken');
+      throw new Error('Session expired. Please login again.');
+    }
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch local jobs');
+    }
+
+    return await response.json();
+  },
+};
+
 // Learning Resources APIs
 export const learningApi = {
   // Get learning resource recommendations
