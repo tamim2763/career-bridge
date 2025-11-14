@@ -1,346 +1,1118 @@
 # CareerBridge – AI-Powered Career Platform
 
-CareerBridge is a modern, feature-rich web application designed to help students and fresh graduates discover their perfect career path through AI-powered recommendations, curated job opportunities, and personalized learning resources.  
-The interface features a sleek dark theme with glassmorphism effects, blue-purple gradient accents, and smooth animations to deliver a professional yet approachable experience.
+> A comprehensive full-stack career development platform helping students and fresh graduates discover their perfect career path through intelligent recommendations, real job opportunities, and personalized learning resources.
 
-## Highlights
+## 🌟 Overview
 
-- **Dynamic landing page** with hero section, feature showcase, how-it-works guide, and scrolling testimonials
-- **Interactive dashboard** displaying personalized job recommendations, learning resources, and profile match indicators
-- **Advanced jobs marketplace** with real-time search, location/type filters, and detailed job modal with full descriptions
-- **Learning resources hub** featuring skill and cost-based filters, curated course cards, and direct platform links
-- **Comprehensive profile management** for editing personal info, skills, career preferences, and CV content
-- **Modern authentication** with split-screen login/register flows, Google OAuth integration, and gradient hero sections
-- **Professional footer** inspired by industry leaders, with contact info, navigation links, and social media integration
-- **Smooth animations** and polished hover states creating cohesive user experience across all pages
+CareerBridge is a production-ready web application combining a high-performance Rust backend with a modern React/Next.js frontend. The platform provides an end-to-end career development solution featuring:
 
-## Tech Stack
+- **Intelligent Job Matching** - AI-powered recommendations with real job details from database
+- **Skill Gap Analysis** - Identify missing skills and get personalized learning paths
+- **Progress Tracking** - Monitor applications and learning journey
+- **Modern Authentication** - Email/password, Google OAuth, and GitHub OAuth
+- **Beautiful UI/UX** - Dark theme with glassmorphism effects and smooth animations
 
-### Frontend
-- **Next.js 15.3.5** with Turbopack for blazing-fast development
-- **React 19** with client-side interactivity
-- **Tailwind CSS 4** with custom glassmorphism and gradient utilities
-- **Framer Motion** for smooth page transitions and animations
-- **Radix UI** components for accessible, unstyled primitives
-- **Lucide React** for beautiful, consistent iconography
-- **TypeScript** for type-safe development
-- Custom CSS animations for floating effects and infinite scrolling
+### 🎯 Built For
+- 🎓 **Students** seeking career guidance and internships
+- 👨‍💼 **Fresh Graduates** transitioning into the workforce
+- 📈 **Career Changers** exploring new opportunities
+- 💼 **Job Seekers** looking for personalized recommendations
 
-### Backend
-- **Rust (Axum)** for high-performance API server
-- **PostgreSQL** for reliable data storage
-- **SQLx** for type-safe database queries
-- **JWT** for secure authentication
-- **OAuth2** for Google and GitHub authentication
-- **bcrypt** for password hashing
+## 🎯 Key Features
 
-## Quick Start
+### 🔐 Authentication & User Management
+- **Multiple Login Options**
+  - Traditional email/password authentication
+  - Google OAuth integration
+  - GitHub OAuth integration
+  - Automatic account linking for OAuth users
+- **Two-Step Onboarding**
+  - Instant registration with JWT token
+  - Complete profile later (education, skills, preferences)
+  - Progress tracking with `profile_completed` flag
+- **Secure Implementation**
+  - JWT-based authentication (24-hour validity)
+  - Argon2 password hashing
+  - SQL injection prevention via parameterized queries
+  - Protected API routes with middleware
 
-### Backend Setup
+### 💼 Job Discovery & Matching
+- **Smart Job Recommendations**
+  - AI-powered skill-based matching algorithm
+  - Match scores (0-100%) showing compatibility
+  - Identifies matched and missing skills
+  - Filters by experience level (fresher, junior, mid)
+  - Filters by job type (internship, part-time, full-time, freelance)
+- **Real Job Details** (November 2025 Enhancement)
+  - Comprehensive job descriptions from database
+  - Actual responsibilities for each position
+  - Real requirements and qualifications
+  - Company benefits and perks
+  - Salary ranges (min-max)
+- **Interactive Search**
+  - Real-time search across jobs, companies, and skills
+  - Location filtering (all, remote, onsite)
+  - Type filtering with multiple options
+  - Detailed modal view for each job
+  - Quick apply actions
+
+### 📚 Learning & Development
+- **Personalized Learning Resources**
+  - Curated courses and tutorials
+  - Skill gap-based recommendations
+  - Relevance scoring algorithm
+  - Free and paid resource filtering
+  - Platform badges (Coursera, Udemy, etc.)
+- **Progress Tracking**
+  - Track completion percentage (0-100%)
+  - Automatic completion detection
+  - Learning history timeline
+  - Resource bookmarking
+
+### 📊 Career Analytics
+- **Skill Gap Analysis**
+  - Compare your skills vs role requirements
+  - Calculate match percentage
+  - Identify specific skill gaps
+  - Get recommended courses to bridge gaps
+  - Multi-job aggregated requirements
+- **Application Tracking**
+  - Track all job applications
+  - Status updates (applied, interviewing, offered, rejected)
+  - Timeline visualization
+  - Notes and reminders
+  - Application history
+
+### 🎨 Modern UI/UX
+- **Beautiful Design System**
+  - Dark/light theme toggle with persistence
+  - Glassmorphism effects with backdrop blur
+  - Blue-purple gradient accents throughout
+  - Smooth Framer Motion page transitions
+  - Particle animations and visual effects
+- **Responsive & Accessible**
+  - Mobile, tablet, and desktop optimized
+  - ARIA-compliant components
+  - Keyboard navigation support
+  - Loading states and skeletons
+  - Toast notifications (Sonner)
+- **Interactive Components**
+  - 3D graphics with Three.js and React Three Fiber
+  - Interactive globe visualizations
+  - Animated carousels and marquees
+  - Command palette (⌘K)
+  - Drag & drop file uploads
+
+### 🚀 Performance & Developer Experience
+- **Optimized Stack**
+  - Rust backend for high performance
+  - Next.js 15 with Turbopack for fast development
+  - React 19 with modern hooks
+  - PostgreSQL for reliable data storage
+  - Type-safe queries with SQLx
+- **Developer Tools**
+  - Comprehensive API testing suite (`api_tests.http`)
+  - Full Rust documentation (`cargo doc`)
+  - TypeScript for type safety
+  - ESLint configuration
+  - Hot module replacement
+
+## 🛠️ Technology Stack
+
+### Backend (Rust/Axum)
+| Category | Technologies |
+|----------|-------------|
+| **Language** | Rust (Edition 2024) |
+| **Web Framework** | Axum 0.8 - Modern async web framework |
+| **Database** | PostgreSQL 14+ with SQLx for type-safe queries |
+| **Authentication** | JWT (jsonwebtoken), OAuth2 (Google, GitHub) |
+| **Security** | Argon2 password hashing, SQL injection prevention |
+| **File Handling** | Axum Typed Multipart, pdf-extract for CV parsing |
+| **Validation** | Validator crate with derive macros |
+| **Async Runtime** | Tokio for high-performance async operations |
+| **Logging** | Tracing with structured logging |
+
+### Frontend (Next.js/React)
+| Category | Technologies |
+|----------|-------------|
+| **Framework** | Next.js 15.3.5 with App Router & Turbopack |
+| **UI Library** | React 19 with modern hooks |
+| **Language** | TypeScript for type-safe development |
+| **Styling** | Tailwind CSS 4 with custom utilities |
+| **Components** | Radix UI (50+ accessible components), shadcn/ui architecture |
+| **Animations** | Framer Motion 12, particle effects (@tsparticles) |
+| **3D Graphics** | Three.js, React Three Fiber, drei helpers |
+| **Forms** | React Hook Form with Zod validation |
+| **Icons** | Lucide React, React Icons, Tabler Icons |
+| **Data Viz** | Recharts for charts, dotted-map for maps |
+| **UI Utilities** | Embla Carousel, React Dropzone, React Day Picker |
+| **State** | Better Auth 1.3 for authentication state |
+| **Database (Client)** | Drizzle ORM, LibSQL client |
+| **Notifications** | Sonner for toast messages |
+| **Theme** | next-themes for dark/light mode |
+
+### Database & Infrastructure
+- **PostgreSQL 14+** - Primary data store
+- **Tables**: users, jobs, learning_resources, application_tracking, user_progress, notifications, skill_assessments
+- **Enums**: experience_level, career_track, job_type, cost_indicator
+- **Features**: UUID primary keys, JSONB support, full-text search capabilities
+
+### Development Tools
+- **API Testing**: REST Client (`api_tests.http`)
+- **Documentation**: Rust docs (`cargo doc`), comprehensive READMEs
+- **Code Quality**: ESLint, TypeScript compiler
+- **Build Tools**: Cargo (Rust), npm/Turbopack (frontend)
+- **Version Control**: Git with GitHub integration
+
+## ⚡ Quick Start
+
+### Prerequisites
+- **Rust** 1.70+ ([Install Rust](https://rustup.rs/))
+- **Node.js** 18+ and npm ([Install Node.js](https://nodejs.org/))
+- **PostgreSQL** 14+ ([Install PostgreSQL](https://www.postgresql.org/download/))
+
+### Backend Setup (Port 3000)
 
 ```bash
-# Clone the repository
-git clone https://github.com/tamim2763/career-bridge.git
-
 # Navigate to backend directory
-cd career-bridge/backend
+cd backend
 
-# Setup PostgreSQL database
-createdb career_bridge
+# Create and configure .env file
+cat > .env << EOF
+DATABASE_URL=postgresql://postgres:password@localhost:5432/career_bridge
+JWT_SECRET=your-secret-key-change-in-production
+FRONTEND_URL=http://localhost:3001
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://127.0.0.1:3000/api/auth/google/callback
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+GITHUB_REDIRECT_URI=http://127.0.0.1:3000/api/auth/github/callback
+EOF
 
-# Run database schema
-psql -U your_user -d career_bridge < schema.sql
+# Create database
+createdb -U postgres career_bridge
 
-# Load seed data (includes 20 jobs with full details)
-psql -U your_user -d career_bridge < seed_data.sql
+# Apply schema and seed data
+psql -U postgres -d career_bridge -f schema.sql
+psql -U postgres -d career_bridge -f seed_data.sql
 
-# Configure environment variables
-# Create .env file with:
-# DATABASE_URL=postgres://user:password@localhost/career_bridge
-# JWT_SECRET=your-secret-key
-# GOOGLE_CLIENT_ID=your-google-client-id
-# GOOGLE_CLIENT_SECRET=your-google-client-secret
-# GITHUB_CLIENT_ID=your-github-client-id
-# GITHUB_CLIENT_SECRET=your-github-client-secret
-
-# Build and run the backend
+# Build and run
+cargo build --release
 cargo run
 ```
 
-Backend API will be available at `http://localhost:3000`
+Backend API: `http://localhost:3000`
 
-### API Testing
-
-Use the included `backend/api_tests.http` file with REST Client extension in VS Code, or use curl:
+### Frontend Setup (Port 3001)
 
 ```bash
-# Health check
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run development server with Turbopack
+npm run dev
+```
+
+Frontend App: `http://localhost:3001`
+
+> **Important:** Both servers must be running simultaneously. The frontend (port 3001) communicates with the backend API (port 3000).
+
+### Quick Test
+
+```bash
+# Test backend health
 curl http://localhost:3000/
 
 # Register a user
 curl -X POST http://localhost:3000/api/register \
   -H "Content-Type: application/json" \
-  -d '{"full_name":"John Doe","email":"john@example.com","password":"pass123"}'
+  -d '{"full_name":"Test User","email":"test@example.com","password":"test123"}'
 
-# Login and get token
-curl -X POST http://localhost:3000/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"john@example.com","password":"pass123"}'
-
-# Get job recommendations (requires token)
-curl http://localhost:3000/api/jobs/recommendations \
-  -H "Authorization: Bearer YOUR_TOKEN"
+# Visit frontend
+open http://localhost:3001
 ```
 
-See `backend/api_tests.http` for comprehensive API examples.
-
-### Frontend Setup
-
-```bash
-# Navigate to frontend directory
-cd career-bridge/frontend
-
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-```
-
-Navigate to `http://localhost:3001` to explore the application.
-
-> **Note:** The frontend runs on port 3001, while the backend API runs on port 3000. Make sure both servers are running for the application to work properly.
-
-## Project Structure
+## 📁 Project Architecture
 
 ```
 career-bridge/
-├── backend/
+├── backend/                          # Rust/Axum API Server
 │   ├── src/
-│   │   ├── main.rs                 # Application entry point
-│   │   ├── lib.rs                  # Library exports
-│   │   ├── models.rs               # Database models & enums
-│   │   ├── auth.rs                 # JWT authentication
-│   │   ├── security.rs             # Password hashing & validation
-│   │   ├── errors.rs               # Error handling
-│   │   └── handlers/
-│   │       ├── mod.rs              # Handler module exports
-│   │       ├── auth.rs             # Auth endpoints (login/register)
-│   │       ├── oauth.rs            # OAuth flows (Google/GitHub)
-│   │       ├── profile.rs          # Profile management
-│   │       ├── jobs.rs             # Job recommendations
-│   │       ├── learning.rs         # Learning resources
-│   │       ├── applications.rs     # Application tracking
-│   │       ├── progress.rs         # Progress tracking
-│   │       └── types.rs            # Request/response types
-│   ├── migrations/
-│   │   └── 001_add_job_details.sql # Database migrations
-│   ├── schema.sql                  # Database schema
-│   ├── seed_data.sql               # Sample data (20 jobs)
-│   ├── api_tests.http              # API test examples
-│   ├── Cargo.toml                  # Rust dependencies
-│   └── README.md                   # Backend documentation
-├── frontend/
+│   │   ├── main.rs                  # Application entry point & server setup
+│   │   ├── lib.rs                   # Library exports & crate documentation
+│   │   ├── models.rs                # Database models, enums, & types
+│   │   ├── auth.rs                  # JWT token generation & validation
+│   │   ├── security.rs              # Argon2 password hashing
+│   │   ├── errors.rs                # Centralized error handling
+│   │   └── handlers/                # API endpoint handlers
+│   │       ├── mod.rs               # Module exports
+│   │       ├── types.rs             # Request/response DTOs
+│   │       ├── auth.rs              # Registration & login endpoints
+│   │       ├── oauth.rs             # Google & GitHub OAuth flows
+│   │       ├── profile.rs           # Profile CRUD & CV upload
+│   │       ├── jobs.rs              # Job recommendations & matching
+│   │       ├── learning.rs          # Learning resource recommendations
+│   │       ├── applications.rs      # Application tracking
+│   │       └── progress.rs          # Progress tracking
+│   ├── migrations/                   # Database migration scripts
+│   ├── schema.sql                    # PostgreSQL schema definition
+│   ├── seed_data.sql                 # Sample data (20 jobs with details)
+│   ├── api_tests.http                # REST Client API test suite
+│   ├── Cargo.toml                    # Rust dependencies & metadata
+│   ├── README.md                     # Backend documentation
+│   └── target/                       # Compiled binaries (gitignored)
+│
+├── frontend/                         # Next.js/React Application
 │   ├── src/
-│   │   ├── app/
-│   │   │   ├── dashboard/          # User dashboard with recommendations
-│   │   │   ├── jobs/               # Job listings with search & filters
-│   │   │   ├── resources/          # Learning resources catalog
-│   │   │   ├── profile/            # User profile management
-│   │   │   ├── login/              # Authentication - sign in
-│   │   │   ├── register/           # Authentication - sign up
-│   │   │   ├── onboarding/         # Multi-step onboarding flow
-│   │   │   ├── page.tsx            # Landing page
-│   │   │   ├── layout.tsx          # Root layout wrapper
-│   │   │   ├── template.tsx        # Page transition wrapper
-│   │   │   └── globals.css         # Global styles & animations
-│   │   ├── components/
-│   │   │   ├── ui/                 # Reusable UI components (Radix UI)
-│   │   │   ├── Navbar.tsx          # Navigation component
-│   │   │   ├── Footer.tsx          # Footer with links & contact
-│   │   │   ├── TestimonialScroll.tsx  # Infinite scrolling testimonials
-│   │   │   ├── OnboardingFlow.tsx  # Multi-step onboarding component
-│   │   │   ├── PageTransition.tsx  # Framer Motion page transitions
-│   │   │   ├── ThemeToggle.tsx     # Dark/light theme switcher
-│   │   │   ├── ThemeProvider.tsx   # Theme context provider
-│   │   │   ├── JobCard.tsx         # Job listing card
-│   │   │   ├── ResourceCard.tsx    # Learning resource card
-│   │   │   └── JobDetailsModal.tsx # Job details modal
-│   │   ├── lib/
-│   │   │   ├── api.ts              # API client & types
-│   │   │   └── utils.ts            # Utility functions
-│   │   └── hooks/                  # Custom React hooks
-│   ├── public/                      # Static assets
-│   ├── package.json
-│   ├── next.config.ts
-│   └── README.md
-├── JOB_API_ENHANCEMENT_SUMMARY.md  # API enhancement overview
-├── FRONTEND_MIGRATION.md           # Frontend migration guide
-├── DEPLOYMENT_CHECKLIST.md         # Deployment instructions
-├── README.md                       # This file
-└── .gitignore
+│   │   ├── app/                     # Next.js App Router (pages)
+│   │   │   ├── page.tsx             # Landing page (/)
+│   │   │   ├── layout.tsx           # Root layout with providers
+│   │   │   ├── template.tsx         # Page transition wrapper
+│   │   │   ├── globals.css          # Global styles & animations
+│   │   │   ├── global-error.tsx     # Error boundary
+│   │   │   ├── auth/                # OAuth callback handling
+│   │   │   ├── login/               # Login page with OAuth
+│   │   │   ├── register/            # Registration page
+│   │   │   ├── onboarding/          # Multi-step profile setup
+│   │   │   ├── dashboard/           # User dashboard with recommendations
+│   │   │   ├── jobs/                # Job marketplace & search
+│   │   │   ├── resources/           # Learning resources catalog
+│   │   │   ├── profile/             # Profile management & CV upload
+│   │   │   └── demo/                # Demo/preview pages
+│   │   │
+│   │   ├── components/              # React components
+│   │   │   ├── ui/                  # shadcn/ui components (50+)
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── card.tsx
+│   │   │   │   ├── dialog.tsx
+│   │   │   │   ├── form.tsx
+│   │   │   │   ├── input.tsx
+│   │   │   │   ├── select.tsx
+│   │   │   │   ├── table.tsx
+│   │   │   │   └── ...              # 40+ more components
+│   │   │   │
+│   │   │   ├── Navbar.tsx           # Navigation with theme toggle
+│   │   │   ├── Footer.tsx           # Site footer with links
+│   │   │   ├── JobCard.tsx          # Job listing card
+│   │   │   ├── JobDetailsModal.tsx  # Job details popup
+│   │   │   ├── ResourceCard.tsx     # Learning resource card
+│   │   │   ├── OnboardingFlow.tsx   # Multi-step onboarding
+│   │   │   ├── TestimonialScroll.tsx # Animated testimonials
+│   │   │   ├── PageTransition.tsx   # Framer Motion transitions
+│   │   │   ├── ThemeProvider.tsx    # Theme context
+│   │   │   ├── ThemeToggle.tsx      # Dark/light mode switcher
+│   │   │   ├── ErrorReporter.tsx    # Error tracking
+│   │   │   └── ClientComponents.tsx # Client wrapper
+│   │   │
+│   │   ├── lib/                     # Utilities & helpers
+│   │   │   ├── api.ts               # API client functions & types
+│   │   │   ├── utils.ts             # General utility functions
+│   │   │   ├── jobUtils.ts          # Job-related utilities
+│   │   │   └── hooks/               # Shared custom hooks
+│   │   │
+│   │   ├── hooks/                   # Additional React hooks
+│   │   │   └── use-mobile.ts        # Mobile detection hook
+│   │   │
+│   │   ├── assets/                  # Static assets (images, fonts)
+│   │   ├── visual-edits/            # Visual editing tools
+│   │   ├── App.jsx                  # Legacy app component
+│   │   ├── App.css                  # Legacy styles
+│   │   ├── main.jsx                 # Legacy entry point
+│   │   └── index.css                # Legacy global styles
+│   │
+│   ├── public/                      # Static files (served directly)
+│   ├── components.json              # shadcn/ui configuration
+│   ├── next.config.ts               # Next.js configuration
+│   ├── tsconfig.json                # TypeScript configuration
+│   ├── tailwind.config.js           # Tailwind CSS configuration
+│   ├── postcss.config.mjs           # PostCSS configuration
+│   ├── eslint.config.js             # ESLint configuration
+│   ├── vite.config.js               # Vite config (legacy)
+│   ├── package.json                 # Dependencies & scripts
+│   ├── README.md                    # Frontend documentation
+│   └── node_modules/                # Dependencies (gitignored)
+│
+├── docs/                            # Additional documentation
+│   ├── JOB_API_ENHANCEMENT_SUMMARY.md    # Job API updates overview
+│   ├── FRONTEND_MIGRATION.md             # Frontend migration guide
+│   ├── DEPLOYMENT_CHECKLIST.md           # Deployment instructions
+│   └── BACKEND_CHANGES.md                # Backend changes log
+│
+├── .gitignore                       # Git ignore patterns
+├── LICENSE                          # MIT License
+└── README.md                        # This file (project overview)
 ```
 
-## Current Features
+### Key Directories
 
-### **Backend API**
-- RESTful API with JWT authentication
-- OAuth2 integration (Google, GitHub)
-- **Enhanced Job API** with responsibilities, requirements, and benefits
-- Personalized job recommendations with match scoring
-- Skill gap analysis for target roles
-- Learning resource recommendations
-- Application tracking system
-- Progress tracking for learning resources
-- Secure password hashing and token management
+| Directory | Purpose |
+|-----------|---------|
+| `backend/src/handlers/` | All API endpoint logic organized by feature |
+| `frontend/src/app/` | Next.js pages using App Router architecture |
+| `frontend/src/components/ui/` | Reusable UI components from shadcn/ui |
+| `backend/migrations/` | Database migration scripts for schema updates |
+| `docs/` | Additional project documentation and guides |
 
-### **Landing Page**
-- Engaging hero section with AI-powered platform messaging
-- Feature cards showcasing AI Career Roadmap, Job Matching, Learning Resources, and Progress Tracking
-- Step-by-step "How CareerBridge Works" guide
-- Infinite scrolling testimonials from successful users
-- Comprehensive footer with company info, navigation, and social links
+## 🗄️ Database Schema
 
-### **Dashboard**
-- Personalized user summary with education, track, and experience
-- AI-powered job recommendations matched to user profile
-- Curated learning resources tailored to career goals
-- Interactive job details modal with full descriptions
+### Core Tables
 
-### **Jobs Marketplace**
-- Real-time search across jobs, companies, and skills
-- Advanced filters (location: all/remote/onsite, type: full-time/part-time/contract/internship)
-- Responsive job cards with salary, skills, and quick actions
-- Detailed job modal with **real** responsibilities, requirements, and benefits from database
-- AI-powered job matching with skill gap analysis
-- Match score indicators showing compatibility with user profile
+#### **users**
+Primary user account and profile data
+```sql
+id                UUID PRIMARY KEY
+email             TEXT UNIQUE NOT NULL
+password_hash     TEXT (nullable for OAuth users)
+oauth_provider    VARCHAR(50) (google, github, or NULL)
+oauth_id          VARCHAR(255) (provider's user ID)
+avatar_url        TEXT (profile picture from OAuth)
+full_name         TEXT NOT NULL
+education_level   TEXT
+experience_level  experience_level_enum
+preferred_track   career_track_enum
+profile_completed BOOLEAN DEFAULT false
+skills            TEXT[] (array of skill names)
+projects          TEXT[] (array of project names)
+target_roles      TEXT[] (array of desired job titles)
+raw_cv_text       TEXT (extracted from PDF or manual entry)
+created_at        TIMESTAMPTZ DEFAULT NOW()
+updated_at        TIMESTAMPTZ DEFAULT NOW()
+```
 
-### **Learning Resources**
-- Skill-based and cost-based filtering (free/paid)
-- Clean card layouts with platform badges
-- Direct links to external learning platforms
-- Responsive grid layout for optimal viewing
+#### **jobs**
+Job listings with comprehensive details
+```sql
+id                SERIAL PRIMARY KEY
+job_title         TEXT NOT NULL
+company           TEXT NOT NULL
+location          TEXT
+job_description   TEXT
+required_skills   TEXT[] (array of required skills)
+experience_level  experience_level_enum
+job_type          job_type_enum
+salary_min        INTEGER
+salary_max        INTEGER
+responsibilities  TEXT[] (NEW: array of job responsibilities)
+requirements      TEXT[] (NEW: array of qualifications)
+benefits          TEXT[] (NEW: array of company benefits)
+created_at        TIMESTAMPTZ DEFAULT NOW()
+```
 
-### **Profile Management**
-- Editable personal information fields
-- Dynamic skills management with add/remove functionality
-- Career preferences (education, experience, track)
-- CV/Resume file upload (PDF, DOC, DOCX) with file management
+#### **learning_resources**
+Curated courses and learning materials
+```sql
+id             SERIAL PRIMARY KEY
+title          TEXT NOT NULL
+platform       TEXT (e.g., "Coursera", "Udemy")
+url            TEXT
+related_skills TEXT[] (skills taught)
+cost           cost_indicator_enum (free, paid)
+created_at     TIMESTAMPTZ DEFAULT NOW()
+```
 
-### **Authentication**
-- Split-screen design with gradient hero sections
-- Login page with email/password and "Remember me" option
-- Register page with streamlined sign-up (name, email, password only)
-- Multi-step onboarding flow after registration (education, experience, career track)
-- Google OAuth integration with official branding
-- Elegant "OR" divider for social auth options
-- Mobile-responsive forms with validation
+#### **application_tracking**
+Track user job applications
+```sql
+id         SERIAL PRIMARY KEY
+user_id    UUID REFERENCES users(id)
+job_id     INTEGER REFERENCES jobs(id)
+status     TEXT (applied, interviewing, offered, rejected)
+applied_at TIMESTAMPTZ DEFAULT NOW()
+notes      TEXT
+updated_at TIMESTAMPTZ DEFAULT NOW()
+```
 
-### **UI/UX Excellence**
-- Consistent dark/light theme toggle with glassmorphism effects
-- Blue-purple gradient accents throughout
-- Smooth Framer Motion page transitions between routes
-- Subtle hover and tap animations on buttons and cards
-- Responsive design for all screen sizes
-- Accessible components with proper ARIA labels
+#### **user_progress**
+Track learning resource completion
+```sql
+id                     SERIAL PRIMARY KEY
+user_id                UUID REFERENCES users(id)
+resource_id            INTEGER REFERENCES learning_resources(id)
+completion_percentage  INTEGER (0-100)
+started_at             TIMESTAMPTZ DEFAULT NOW()
+completed_at           TIMESTAMPTZ (set when completion = 100)
+```
 
-## Design System
+#### **notifications**
+User notifications (future feature)
+```sql
+id         SERIAL PRIMARY KEY
+user_id    UUID REFERENCES users(id)
+title      VARCHAR(255)
+message    TEXT
+type       VARCHAR(50)
+is_read    BOOLEAN DEFAULT false
+created_at TIMESTAMPTZ DEFAULT NOW()
+```
 
-- **Colors**: Dark background with blue (#3b82f6) to purple (#a855f7) gradients
-- **Effects**: Glass morphism with backdrop blur, subtle borders, and glow effects
-- **Typography**: Poppins for headings, Inter for body text
-- **Animations**: Floating elements, infinite scroll, hover scale effects
-- **Components**: Radix UI primitives with custom Tailwind styling
+#### **skill_assessments**
+Skill proficiency tracking (future feature)
+```sql
+id                SERIAL PRIMARY KEY
+user_id           UUID REFERENCES users(id)
+skill_name        VARCHAR(255)
+proficiency_level INTEGER (1-10 scale)
+assessed_at       TIMESTAMPTZ DEFAULT NOW()
+```
 
-## Pages Overview
+### Enums
 
-1. **Home (`/`)** – Landing page with hero, features, how-it-works, testimonials, and footer
-2. **Dashboard (`/dashboard`)** – Personalized overview with job and resource recommendations
-3. **Jobs (`/jobs`)** – Searchable job listings with advanced filters
-4. **Resources (`/resources`)** – Curated learning materials with skill filters
-5. **Profile (`/profile`)** – User profile editor with skills management and CV upload
-6. **Login (`/login`)** – Sign in with email/password or Google OAuth
-7. **Register (`/register`)** – Create account with name, email, and password
-8. **Onboarding (`/onboarding`)** – Multi-step onboarding flow for education, experience, and career track
+```sql
+-- User experience levels
+experience_level_enum: fresher | junior | mid
 
-Each page features smooth client-side navigation and maintains state during demo interactions.
+-- Career paths
+career_track_enum: web_development | data | design | marketing
 
-## API Endpoints
+-- Job types
+job_type_enum: internship | part_time | full_time | freelance
 
-### Authentication
-- `POST /api/register` - Create new user account
-- `POST /api/login` - Login with email/password
-- `GET /api/auth/google` - Initiate Google OAuth flow
-- `GET /api/auth/github` - Initiate GitHub OAuth flow
+-- Resource cost
+cost_indicator_enum: free | paid
+```
 
-### Profile Management (Protected)
-- `GET /api/profile` - Get user profile
-- `POST /api/profile/complete` - Complete profile onboarding
-- `PUT /api/profile` - Update profile information
+### Indexes
 
-### Jobs (Protected)
-- `GET /api/jobs/recommendations` - Get personalized job recommendations
-  - Query params: `experience_level`, `job_type`, `limit`
-  - Returns: Jobs with match scores, responsibilities, requirements, benefits
+```sql
+-- Performance optimization indexes
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_oauth ON users(oauth_provider, oauth_id);
+CREATE INDEX idx_jobs_skills ON jobs USING GIN(required_skills);
+CREATE INDEX idx_applications_user ON application_tracking(user_id);
+CREATE INDEX idx_progress_user ON user_progress(user_id);
+```
 
-### Learning Resources (Protected)
-- `GET /api/learning/recommendations` - Get personalized learning resources
+### Sample Data
 
-### Skill Gap Analysis (Protected)
-- `GET /api/skill-gap/{target_role}` - Analyze skill gaps for target role
-  - Returns: Required jobs, skills gap, recommended resources
+The `seed_data.sql` file includes:
+- **20 diverse jobs** across multiple industries
+- **Full job details** (responsibilities, requirements, benefits)
+- **15+ learning resources** from various platforms
+- Realistic salary ranges and skill requirements
 
-### Application Tracking (Protected)
-- `POST /api/applications` - Create job application
-- `GET /api/applications` - Get user's applications
-- `PUT /api/applications/{id}` - Update application status
+## 🔌 API Reference
 
-### Progress Tracking (Protected)
-- `POST /api/progress/resource/{id}/start` - Start learning resource
-- `PUT /api/progress/resource/{id}` - Update progress percentage
-- `GET /api/progress` - Get all user progress
+### Base URL
+```
+http://localhost:3000
+```
 
-All protected endpoints require `Authorization: Bearer <token>` header.
+### Authentication Flow
 
-## Recent Enhancements
+#### 1. Register (Traditional)
+```http
+POST /api/register
+Content-Type: application/json
 
-### Job API Enhancement (November 2025)
-The Job API has been significantly improved to provide real, database-driven job details:
-- **New Fields**: Each job now includes `responsibilities`, `requirements`, and `benefits` arrays
-- **Real Data**: All 20 sample jobs populated with realistic, role-specific information
-- **Better UX**: Users see actual job details instead of generic templates
-- **Data Integrity**: Single source of truth in database, no client-side generation
+{
+  "full_name": "John Doe",
+  "email": "john@example.com",
+  "password": "securepass123"
+}
 
-See `JOB_API_ENHANCEMENT_SUMMARY.md` and `FRONTEND_MIGRATION.md` for complete details.
+Response: { "token": "jwt_token", "user_id": "uuid", "message": "..." }
+```
 
-## Future Enhancements
+#### 2. OAuth (Google/GitHub)
+```http
+GET /api/auth/google    # Redirects to Google OAuth
+GET /api/auth/github    # Redirects to GitHub OAuth
 
-- AI-powered career roadmap generation with personalized milestones
-- Advanced job search with salary negotiation insights
-- Real-time notifications for new job matches
-- Social features (networking, mentorship matching)
-- Resume builder and interview preparation tools
-- Company reviews and culture insights
-- Skill assessments and certifications tracking
+# After OAuth, redirects to:
+http://localhost:3001/auth/callback?token=<JWT>&new_user=<true|false>
+```
 
-## Documentation
+#### 3. Login
+```http
+POST /api/login
+Content-Type: application/json
 
-For more detailed information, see:
-- **`backend/BACKEND_CHANGES.md`** - Complete backend API documentation and changes
-- **`JOB_API_ENHANCEMENT_SUMMARY.md`** - Overview of job API enhancements
-- **`FRONTEND_MIGRATION.md`** - Frontend integration guide for new API features
-- **`DEPLOYMENT_CHECKLIST.md`** - Step-by-step deployment instructions
-- **`backend/api_tests.http`** - Comprehensive API testing examples
+{
+  "email": "john@example.com",
+  "password": "securepass123"
+}
 
-## Contributing
+Response: { "token": "jwt_token", "user": {...} }
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Protected Endpoints
 
-## License
+**Required Header:**
+```
+Authorization: Bearer <jwt_token>
+```
 
-This project is licensed under the MIT License.
+#### Profile Management
+```http
+GET /api/profile                      # Get current user profile
+POST /api/profile/complete            # Complete profile onboarding
+PUT /api/profile                      # Update profile fields
+POST /api/profile/cv/upload           # Upload CV PDF
+```
 
----
+#### Job Recommendations
+```http
+GET /api/jobs/recommendations?experience_level=junior&job_type=full_time&limit=10
 
-Built with ❤️ by the CareerBridge Team
+Response: Array of jobs with:
+- job (id, title, company, location, description, skills, salary)
+- responsibilities[] (real from database)
+- requirements[] (real from database)
+- benefits[] (real from database)
+- match_score (0-100)
+- matched_skills[]
+- missing_skills[]
+```
+
+#### Learning Resources
+```http
+GET /api/learning/recommendations     # Get personalized courses
+```
+
+#### Skill Gap Analysis
+```http
+GET /api/skill-gap/{target_role}      # Analyze skill gaps
+
+Response:
+- user_skills[]
+- required_skills[]
+- skill_gaps[]
+- match_percentage
+- recommended_resources[]
+```
+
+#### Application Tracking
+```http
+POST /api/applications                # Create application
+GET /api/applications                 # Get all applications
+PUT /api/applications/{id}            # Update application status
+```
+
+#### Progress Tracking
+```http
+POST /api/progress/resource/{id}/start           # Start learning
+PUT /api/progress/resource/{id}                  # Update progress
+GET /api/progress                                # Get all progress
+```
+
+### Query Parameters
+
+| Endpoint | Parameter | Values |
+|----------|-----------|--------|
+| `/api/jobs/recommendations` | `experience_level` | `fresher`, `junior`, `mid` |
+| | `job_type` | `internship`, `part_time`, `full_time`, `freelance` |
+| | `limit` | Number (default: 10) |
+
+### Response Codes
+
+| Code | Meaning |
+|------|---------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request (validation error) |
+| 401 | Unauthorized (missing/invalid token) |
+| 404 | Not Found |
+| 409 | Conflict (e.g., email exists) |
+| 500 | Internal Server Error |
+
+### Testing
+
+Use `backend/api_tests.http` with [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension in VS Code for interactive API testing.
+
+```bash
+# Or use curl
+curl -X POST http://localhost:3000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"full_name":"Test User","email":"test@example.com","password":"test123"}'
+```
+
+## 🎨 Design System & UI Pages
+
+### Design Principles
+
+**Color Palette**
+- **Background**: Dark theme (#0a0a0a) with subtle gradients
+- **Primary**: Blue (#3b82f6) to Purple (#a855f7) gradients
+- **Accents**: Cyan (#06b6d4), Pink (#ec4899), Emerald (#10b981)
+- **Glassmorphism**: backdrop-blur with rgba overlays
+
+**Typography**
+- **Headings**: Poppins (bold, semi-bold)
+- **Body**: Inter (regular, medium)
+- **Monospace**: JetBrains Mono for code
+
+**Effects & Animations**
+- Glassmorphism with backdrop blur and borders
+- Smooth Framer Motion page transitions
+- Hover scale effects (1.05x)
+- Floating animations for hero elements
+- Infinite scroll marquees
+- Particle backgrounds with @tsparticles
+- 3D globe visualizations
+
+**Component Architecture**
+- Radix UI primitives for accessibility
+- shadcn/ui component patterns
+- Custom Tailwind utilities
+- Responsive breakpoints (sm, md, lg, xl, 2xl)
+
+### Application Pages
+
+#### 🏠 **Landing Page** (`/`)
+Landing experience with multiple sections:
+- **Hero Section**: Animated headline, CTA buttons, 3D graphics
+- **Features Showcase**: AI Career Roadmap, Job Matching, Resources, Progress
+- **How It Works**: Step-by-step guide (Register → Explore → Apply → Track)
+- **Testimonials**: Infinite scrolling success stories
+- **Footer**: Company info, navigation links, social media
+
+#### 📊 **Dashboard** (`/dashboard`)
+Personalized control center:
+- User summary card (name, education, track, experience)
+- AI-powered job recommendations with match scores
+- Curated learning resources
+- Quick actions and statistics
+- Recent activity timeline
+
+#### 💼 **Jobs Marketplace** (`/jobs`)
+Comprehensive job search:
+- Real-time search bar (jobs, companies, skills)
+- Advanced filters:
+  - Location: All, Remote, Onsite
+  - Type: Full-time, Part-time, Internship, Freelance
+  - Experience: Fresher, Junior, Mid
+- Job cards with:
+  - Company and title
+  - Salary range
+  - Required skills badges
+  - Match score indicator
+  - Quick actions (View, Save, Apply)
+- Job details modal with:
+  - Full description
+  - Responsibilities list
+  - Requirements list
+  - Benefits & perks
+  - Apply button
+
+#### 📚 **Learning Resources** (`/resources`)
+Educational content hub:
+- Skill-based filtering
+- Cost filtering (Free, Paid, All)
+- Resource cards with:
+  - Course title and platform
+  - Related skills
+  - Direct link to course
+  - Platform badge
+- Responsive masonry grid layout
+
+#### 👤 **Profile Management** (`/profile`)
+Comprehensive profile editor:
+- Personal information fields
+- Skills management:
+  - Add new skills with autocomplete
+  - Remove existing skills
+  - Visual skill badges
+- Career preferences:
+  - Education level
+  - Experience level
+  - Preferred career track
+  - Target roles
+- CV/Resume management:
+  - PDF upload with drag & drop
+  - Text extraction preview
+  - Manual text entry option
+  - File size validation
+
+#### 🔐 **Authentication Pages**
+
+**Login** (`/login`)
+- Split-screen layout
+- Email/password form with validation
+- "Remember me" checkbox
+- Google OAuth button
+- GitHub OAuth button
+- Link to registration page
+- Gradient hero section
+
+**Register** (`/register`)
+- Streamlined sign-up (name, email, password only)
+- Instant JWT token on registration
+- Social auth options (Google, GitHub)
+- Password strength indicator
+- Link to login page
+
+**Onboarding** (`/onboarding`)
+Multi-step profile completion:
+1. **Education**: Select education level
+2. **Experience**: Choose experience level (fresher/junior/mid)
+3. **Career Track**: Pick preferred track (web dev, data, design, marketing)
+4. **Skills**: Add initial skills
+5. **Projects**: List projects (optional)
+6. **Target Roles**: Specify desired job titles
+
+#### 🔄 **OAuth Callback** (`/auth/callback`)
+Handles OAuth redirects with JWT token parsing and user routing
+
+#### 🎭 **Demo Pages** (`/demo`)
+Component showcases and feature previews
+
+### Responsive Design
+
+| Breakpoint | Width | Layout |
+|------------|-------|--------|
+| Mobile | < 640px | Single column, stacked |
+| Tablet | 640-1024px | Two columns, condensed nav |
+| Desktop | 1024-1536px | Three columns, full nav |
+| Wide | > 1536px | Four columns, expanded |
+
+### Accessibility Features
+
+✅ ARIA labels on all interactive elements  
+✅ Keyboard navigation support  
+✅ Focus indicators for tab navigation  
+✅ Screen reader compatible  
+✅ Semantic HTML5 structure  
+✅ High contrast ratios (WCAG AA compliant)  
+✅ Alt text for all images  
+✅ Form validation with error messages
+
+## 🧮 Core Algorithms
+
+### Job Matching Algorithm
+
+Calculates compatibility between user and job postings:
+
+```rust
+match_score = (matched_skills_count / required_skills_count) × 100
+
+Example:
+User skills: ["JavaScript", "React", "Node.js"]
+Job requires: ["JavaScript", "React", "CSS", "HTML"]
+Matched: ["JavaScript", "React"] = 2
+Required: 4
+Score: (2/4) × 100 = 50%
+```
+
+**Features:**
+- Case-insensitive skill matching
+- Identifies matched and missing skills
+- Returns sorted by match score (descending)
+- Filters by experience level and job type
+
+### Learning Resource Relevance
+
+Prioritizes resources teaching new skills:
+
+```rust
+relevance_score = (new_skills_count / total_skills_taught) × 100
+
+Example:
+User skills: ["Python"]
+Resource teaches: ["Python", "Django", "REST API"]
+New skills: ["Django", "REST API"] = 2
+Total taught: 3
+Relevance: (2/3) × 100 = 66.7%
+```
+
+**Features:**
+- Focuses on skill gap closure
+- Considers user's current skill set
+- Sorts by relevance score
+
+### Skill Gap Analysis
+
+Aggregates requirements across multiple jobs:
+
+```rust
+1. Find all jobs matching target role
+2. Collect all required skills across jobs
+3. Compare with user's current skills
+4. Calculate: match_percentage = (matching_skills / required_skills) × 100
+5. Recommend resources for missing skills
+
+Example:
+Target role: "Full Stack Developer"
+Required skills (aggregated): ["JavaScript", "React", "Node.js", "PostgreSQL", "Docker"]
+User has: ["JavaScript", "React"]
+Gap: ["Node.js", "PostgreSQL", "Docker"]
+Match: (2/5) × 100 = 40%
+```
+
+**Features:**
+- Multi-job aggregation for comprehensive analysis
+- Identifies specific skill gaps
+- Provides targeted learning recommendations
+- Shows match percentage for motivation
+
+```
+
+## 📊 Logging & Monitoring
+
+### Backend Logging
+
+Comprehensive tracing with structured logs:
+
+```rust
+// Log levels used:
+INFO  - Business operations, successful actions
+DEBUG - Detailed diagnostics, query parameters
+WARN  - User errors, validation failures
+ERROR - System errors, database failures
+```
+
+**What's Logged:**
+- All authentication attempts (success/failure)
+- Profile operations and updates
+- Job recommendations with match scores
+- Application tracking events
+- OAuth flows and redirects
+- Database query performance
+- Error conditions with context
+
+**Configuration:**
+```bash
+# Set log level
+RUST_LOG=info cargo run      # Default (recommended)
+RUST_LOG=debug cargo run     # Verbose debugging
+RUST_LOG=warn cargo run      # Warnings and errors only
+```
+
+**Example Logs:**
+```
+INFO  User registered successfully: test@example.com
+DEBUG Job recommendations - Experience: junior, Limit: 10
+WARN  Login failed: Invalid password for user@example.com
+ERROR Database connection pool exhausted
+```
+
+### Error Handling
+
+**Smart Error Messages:**
+- User-facing errors are friendly and actionable
+- System errors are logged with full context
+- Validation errors include field-specific messages
+- OAuth errors redirect with clear feedback
+
+**Example:**
+```rust
+// Database error (internal)
+ERROR Failed to insert user: duplicate key value violates unique constraint
+
+// User sees:
+"An account with this email already exists. Please login or use a different email."
+```
+
+## 🚀 Deployment
+
+### Production Checklist
+
+#### Backend Deployment
+- [ ] Set strong `JWT_SECRET` (use `openssl rand -base64 32`)
+- [ ] Configure production database URL
+- [ ] Set up database connection pooling (recommended: 10-20 connections)
+- [ ] Enable HTTPS/TLS with valid certificates
+- [ ] Configure CORS for frontend domain
+- [ ] Set up rate limiting (e.g., 100 requests/minute)
+- [ ] Enable database backups (daily recommended)
+- [ ] Set up error monitoring (Sentry, Rollbar, etc.)
+- [ ] Configure production logging (structured JSON logs)
+- [ ] Set up health check endpoint monitoring
+- [ ] Validate OAuth redirect URIs for production domain
+- [ ] Set appropriate file upload limits
+
+#### Frontend Deployment
+- [ ] Set production API URL in environment
+- [ ] Configure OAuth client IDs for production
+- [ ] Enable production build optimizations
+- [ ] Set up CDN for static assets
+- [ ] Configure analytics (Google Analytics, Plausible, etc.)
+- [ ] Set up error tracking (Sentry)
+- [ ] Optimize images (Next.js Image optimization)
+- [ ] Enable compression (Gzip/Brotli)
+- [ ] Set appropriate CSP headers
+- [ ] Configure robots.txt and sitemap
+
+### Build for Production
+
+**Backend:**
+```bash
+cd backend
+
+# Build optimized binary
+cargo build --release
+
+# Binary location
+./target/release/backend
+
+# Run with production env
+DATABASE_URL="postgresql://user:pass@host/db" \
+JWT_SECRET="your-production-secret" \
+FRONTEND_URL="https://yourdomain.com" \
+./target/release/backend
+```
+
+**Frontend:**
+```bash
+cd frontend
+
+# Build optimized static site
+npm run build
+
+# Test production build
+npm start
+
+# Output in .next/ directory
+```
+
+### Hosting Options
+
+#### Backend (Rust/Axum)
+- **Railway** - Easy Rust deployment with PostgreSQL
+- **Fly.io** - Global edge deployment
+- **DigitalOcean App Platform** - Managed Rust hosting
+- **AWS EC2** - Full control with custom setup
+- **Heroku** - Buildpack for Rust available
+- **VPS** (DigitalOcean, Linode) - Self-managed
+
+#### Frontend (Next.js)
+- **Vercel** - Optimized for Next.js (recommended)
+- **Netlify** - Easy deployment with git integration
+- **Cloudflare Pages** - Fast global CDN
+- **AWS Amplify** - Full-stack hosting
+- **DigitalOcean App Platform** - Managed hosting
+
+#### Database (PostgreSQL)
+- **Railway** - Integrated PostgreSQL
+- **Supabase** - PostgreSQL with extras
+- **Neon** - Serverless PostgreSQL
+- **AWS RDS** - Managed PostgreSQL
+- **DigitalOcean Managed Databases** - Reliable and affordable
+
+### Environment Variables
+
+**Backend `.env.production`:**
+```env
+DATABASE_URL=postgresql://user:pass@prod-host:5432/career_bridge
+JWT_SECRET=your-strong-production-secret-min-32-chars
+FRONTEND_URL=https://yourdomain.com
+GOOGLE_CLIENT_ID=your-prod-google-client-id
+GOOGLE_CLIENT_SECRET=your-prod-google-secret
+GOOGLE_REDIRECT_URI=https://api.yourdomain.com/api/auth/google/callback
+GITHUB_CLIENT_ID=your-prod-github-client-id
+GITHUB_CLIENT_SECRET=your-prod-github-secret
+GITHUB_REDIRECT_URI=https://api.yourdomain.com/api/auth/github/callback
+RUST_LOG=info
+```
+
+**Frontend `.env.production`:**
+```env
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-prod-google-client-id
+```
+## 📚 Documentation
+
+### Available Documentation
+
+| Document | Description |
+|----------|-------------|
+| [`README.md`](README.md) | This file - comprehensive project overview |
+| [`backend/README.md`](backend/README.md) | Detailed backend API documentation |
+| [`frontend/README.md`](frontend/README.md) | Frontend architecture and setup guide |
+| [`backend/api_tests.http`](backend/api_tests.http) | Interactive API testing examples |
+
+### Code Documentation
+
+**Backend (Rust):**
+```bash
+cd backend
+
+# Generate and open HTML documentation
+cargo doc --open --no-deps
+
+# Includes:
+# - Module documentation
+# - Struct and enum definitions
+# - Function signatures with examples
+# - Error conditions
+```
+
+**Frontend (TypeScript):**
+- Type definitions in `lib/api.ts`
+- Component documentation in JSDoc comments
+- README files in major directories
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how to get started:
+
+### Development Workflow
+
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. **Make your changes**
+   - Follow existing code style
+   - Add tests for new features
+   - Update documentation
+4. **Test your changes**
+   ```bash
+   # Backend
+   cargo test
+   cargo fmt -- --check
+   cargo clippy
+   
+   # Frontend
+   npm run lint
+   npm run build
+   ```
+5. **Commit with clear messages**
+   ```bash
+   git commit -m "feat: add job filtering by salary range"
+   ```
+6. **Push and create Pull Request**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+
+```
+MIT License
+
+Copyright (c) 2025 CareerBridge Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+<div align="center">
+
+**Built with ❤️ by the From_Los_Santosh Team**
+
+🚀 Empowering careers through technology
+
+</div>
 
