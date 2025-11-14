@@ -6,11 +6,12 @@ import Navbar from "@/components/Navbar"
 import JobCard from "@/components/JobCard"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Filter, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Filter, ChevronLeft, ChevronRight, Globe, Building, Landmark } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { jobsApi } from "@/lib/api"
+import { jobsApi, externalJobsApi, ExternalJob } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Lazy load heavy components
 const JobDetailsModal = dynamic(() => import("@/components/JobDetailsModal"), {
@@ -31,6 +32,9 @@ export default function JobsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [activeTab, setActiveTab] = useState("platform")
+  const [externalJobs, setExternalJobs] = useState<ExternalJob[]>([])
+  const [isLoadingExternal, setIsLoadingExternal] = useState(false)
 
   useEffect(() => {
     const loadJobs = async () => {
@@ -100,12 +104,48 @@ export default function JobsPage() {
     loadJobs()
   }, [router])
 
+  // Load external jobs when tab changes
+  useEffect(() => {
+    const loadExternalJobs = async () => {
+      if (activeTab === "platform") return
+
+      setIsLoadingExternal(true)
+      try {
+        let jobs: ExternalJob[] = []
+        
+        if (activeTab === "all") {
+          jobs = await externalJobsApi.getAll()
+        } else if (activeTab === "ngo") {
+          jobs = await externalJobsApi.getNGO()
+        } else if (activeTab === "govt") {
+          jobs = await externalJobsApi.getGovt()
+        } else if (activeTab === "local") {
+          jobs = await externalJobsApi.getLocal()
+        }
+
+        setExternalJobs(jobs)
+      } catch (err: any) {
+        console.error('Error loading external jobs:', err)
+        toast.error('Failed to load external jobs: ' + err.message)
+        setExternalJobs([])
+      } finally {
+        setIsLoadingExternal(false)
+      }
+    }
+
+    loadExternalJobs()
+  }, [activeTab])
+
   const handleViewJobDetails = (jobId: string) => {
     const job = allJobs.find(j => j.id === jobId)
     if (job) {
       setSelectedJob(job)
       setModalOpen(true)
     }
+  }
+
+  const handleViewExternalJob = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer')
   }
 
   const filteredJobs = allJobs.filter(job => {
@@ -122,21 +162,92 @@ export default function JobsPage() {
     return matchesSearch && matchesLocation && matchesType
   })
 
-  // Pagination calculations
+  // Filter external jobs
+  const filteredExternalJobs = externalJobs.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         job.skills.some((skill: string) => skill.toLowerCase().includes(searchQuery.toLowerCase()))
+    
+    return matchesSearch
+  })
+
+  // Pagination calculations for platform jobs
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const paginatedJobs = filteredJobs.slice(startIndex, endIndex)
 
+  // Pagination calculations for external jobs
+  const totalPagesExternal = Math.ceil(filteredExternalJobs.length / itemsPerPage)
+  const startIndexExternal = (currentPage - 1) * itemsPerPage
+  const endIndexExternal = startIndexExternal + itemsPerPage
+  const paginatedExternalJobs = filteredExternalJobs.slice(startIndexExternal, endIndexExternal)
+
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, locationFilter, typeFilter, itemsPerPage])
+  }, [searchQuery, locationFilter, typeFilter, itemsPerPage, activeTab])
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading jobs...</div>
+      </div>
+    )
+  }
+
+  const renderPaginationControls = (totalPgs: number) => {
+    if (totalPgs <= 1) return null
+    
+    return (
+      <div className="flex items-center justify-center gap-2 mt-8">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+          disabled={currentPage === 1}
+          className="glass-effect border-gray-300 dark:border-white/10 hover:bg-blue-500/10 disabled:opacity-50"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        
+        <div className="flex items-center gap-1">
+          {Array.from({ length: totalPgs }, (_, i) => i + 1).map((page) => {
+            if (
+              page === 1 ||
+              page === totalPgs ||
+              (page >= currentPage - 1 && page <= currentPage + 1)
+            ) {
+              return (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="icon"
+                  onClick={() => setCurrentPage(page)}
+                  className={currentPage === page 
+                    ? "bg-blue-500 hover:bg-blue-600 text-white" 
+                    : "glass-effect border-gray-300 dark:border-white/10 hover:bg-blue-500/10"
+                  }
+                >
+                  {page}
+                </Button>
+              )
+            } else if (page === currentPage - 2 || page === currentPage + 2) {
+              return <span key={page} className="text-muted-foreground">...</span>
+            }
+            return null
+          })}
+        </div>
+
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setCurrentPage(prev => Math.min(totalPgs, prev + 1))}
+          disabled={currentPage === totalPgs}
+          className="glass-effect border-gray-300 dark:border-white/10 hover:bg-blue-500/10 disabled:opacity-50"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
     )
   }
@@ -150,9 +261,33 @@ export default function JobsPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gradient mb-2">Explore Jobs</h1>
           <p className="text-muted-foreground">
-            Find your perfect opportunity from {allJobs.length} available positions
+            Discover opportunities from multiple sources - platform jobs, NGOs, government portals & local boards
           </p>
         </div>
+
+        {/* Job Source Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <TabsList className="glass-effect border border-gray-200 dark:border-white/10">
+            <TabsTrigger value="platform" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
+              <Building className="w-4 h-4 mr-2" />
+              Platform Jobs
+            </TabsTrigger>
+            <TabsTrigger value="all" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
+              <Globe className="w-4 h-4 mr-2" />
+              All External
+            </TabsTrigger>
+            <TabsTrigger value="ngo" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white">
+              NGO Jobs
+            </TabsTrigger>
+            <TabsTrigger value="govt" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+              <Landmark className="w-4 h-4 mr-2" />
+              Government
+            </TabsTrigger>
+            <TabsTrigger value="local" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
+              Local Boards
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
 
         {/* Search and Filters */}
         <div className="glass-effect rounded-xl p-6 mb-8 border border-gray-200 dark:border-white/10">
@@ -207,7 +342,11 @@ export default function JobsPage() {
           {/* Results count and items per page */}
           <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="text-sm text-muted-foreground">
-              Showing <span className="text-foreground font-medium">{startIndex + 1}-{Math.min(endIndex, filteredJobs.length)}</span> of <span className="text-foreground font-medium">{filteredJobs.length}</span> results
+              {activeTab === "platform" ? (
+                <>Showing <span className="text-foreground font-medium">{startIndex + 1}-{Math.min(endIndex, filteredJobs.length)}</span> of <span className="text-foreground font-medium">{filteredJobs.length}</span> results</>
+              ) : (
+                <>Showing <span className="text-foreground font-medium">{startIndexExternal + 1}-{Math.min(endIndexExternal, filteredExternalJobs.length)}</span> of <span className="text-foreground font-medium">{filteredExternalJobs.length}</span> results</>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Jobs per page:</span>
@@ -226,79 +365,101 @@ export default function JobsPage() {
           </div>
         </div>
 
-        {/* Jobs Grid */}
-        {filteredJobs.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedJobs.map((job) => (
-                <JobCard
-                  key={job.id}
-                  {...job}
-                  onViewDetails={handleViewJobDetails}
-                />
-              ))}
-            </div>
-
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  className="glass-effect border-gray-300 dark:border-white/10 hover:bg-blue-500/10 disabled:opacity-50"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                    // Show first page, last page, current page, and pages around current
-                    if (
-                      page === 1 ||
-                      page === totalPages ||
-                      (page >= currentPage - 1 && page <= currentPage + 1)
-                    ) {
-                      return (
-                        <Button
-                          key={page}
-                          variant={currentPage === page ? "default" : "outline"}
-                          size="icon"
-                          onClick={() => setCurrentPage(page)}
-                          className={currentPage === page 
-                            ? "bg-blue-500 hover:bg-blue-600 text-white" 
-                            : "glass-effect border-gray-300 dark:border-white/10 hover:bg-blue-500/10"
-                          }
-                        >
-                          {page}
-                        </Button>
-                      )
-                    } else if (page === currentPage - 2 || page === currentPage + 2) {
-                      return <span key={page} className="text-muted-foreground">...</span>
-                    }
-                    return null
-                  })}
-                </div>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                  className="glass-effect border-gray-300 dark:border-white/10 hover:bg-blue-500/10 disabled:opacity-50"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+        {/* Platform Jobs Grid */}
+        {activeTab === "platform" && (
+          filteredJobs.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {paginatedJobs.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    {...job}
+                    onViewDetails={handleViewJobDetails}
+                  />
+                ))}
               </div>
-            )}
-          </>
-        ) : (
-          <div className="glass-effect rounded-xl p-12 text-center border border-white/10">
-            <p className="text-muted-foreground text-lg">
-              No jobs found matching your criteria. Try adjusting your filters.
-            </p>
-          </div>
+              {renderPaginationControls(totalPages)}
+            </>
+          ) : (
+            <div className="glass-effect rounded-xl p-12 text-center border border-white/10">
+              <p className="text-muted-foreground text-lg">
+                No jobs found matching your criteria. Try adjusting your filters.
+              </p>
+            </div>
+          )
+        )}
+
+        {/* External Jobs Grid */}
+        {activeTab !== "platform" && (
+          isLoadingExternal ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-pulse text-muted-foreground">Loading external jobs...</div>
+            </div>
+          ) : filteredExternalJobs.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {paginatedExternalJobs.map((job) => (
+                  <div
+                    key={job.id}
+                    className="glass-effect rounded-xl p-6 border border-gray-200 dark:border-white/10 hover:border-blue-500 dark:hover:border-blue-500 transition-all cursor-pointer"
+                    onClick={() => handleViewExternalJob(job.url)}
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="font-semibold text-lg text-foreground line-clamp-2">{job.title}</h3>
+                      <span className="text-xs px-2 py-1 rounded-full bg-blue-500/10 text-blue-500 whitespace-nowrap ml-2">
+                        {job.source}
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-2 mb-4">
+                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Building className="w-4 h-4" />
+                        {job.company}
+                      </p>
+                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Globe className="w-4 h-4" />
+                        {job.location}
+                      </p>
+                      {job.salary && (
+                        <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                          {job.salary}
+                        </p>
+                      )}
+                    </div>
+
+                    {job.skills.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {job.skills.slice(0, 3).map((skill, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-gray-100 dark:bg-white/5 rounded-md text-xs text-foreground"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                        {job.skills.length > 3 && (
+                          <span className="px-2 py-1 bg-gray-100 dark:bg-white/5 rounded-md text-xs text-muted-foreground">
+                            +{job.skills.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="text-xs text-muted-foreground">
+                      Posted: {new Date(job.posted_date).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {renderPaginationControls(totalPagesExternal)}
+            </>
+          ) : (
+            <div className="glass-effect rounded-xl p-12 text-center border border-white/10">
+              <p className="text-muted-foreground text-lg">
+                No external jobs found. Try a different source or check back later.
+              </p>
+            </div>
+          )
         )}
       </main>
 
